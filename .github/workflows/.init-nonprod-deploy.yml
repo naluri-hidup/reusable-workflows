@@ -2,6 +2,9 @@ name: Workflow for nonprod deployment - initialization
 
 on:
   workflow_call:
+    secrets:
+      SLACK_DEPLOYMENT_WEBHOOK:
+        required: true
     inputs:
       deploy_env:
         required: false

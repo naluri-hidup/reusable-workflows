@@ -2,7 +2,14 @@ name: Workflow for nonprod deployment - ECS
 
 on:
   workflow_call:
-
+    secrets:
+      GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
+      GH_ACTIONS_REGION:
+        required: true
+        
 jobs:
   ecs-nonprod-deploy: 
     runs-on: ubuntu-latest
