@@ -1,0 +1,34 @@
+name: Workflow for nonprod deployment - initialization
+
+on:
+  workflow_call:
+    inputs:
+      deploy_env:
+        required: true
+        type: string
+        default: 'staging'
+        
+jobs:
+  init-nonprod-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set branch
+        id: set_branch
+        shell: bash
+        run: echo "::set-output name=value::$(echo ${GITHUB_REF#refs/heads/})"
+
+      - name: Set Deploy Environment
+        id: set_deploy_env
+        run: |
+          DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
+          echo "::set-output name=value::${DEPLOY_ENV:-"staging"}"
+
+      - name: Slack Notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_branch.outputs.value }} to deployment to ${{ step.set_deploy_env.outputs.value }} by *@${{ github.actor }}*: `started`"}' \
+          ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+    
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
