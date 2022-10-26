@@ -12,10 +12,10 @@ on:
 
 jobs:
   init:
-    uses: naluri-hidup/reusable-workflow/.github/workflows/.init-nonprod-deploy.yml
+    uses: naluri-hidup/reusable-workflow/.github/workflows/.init-nonprod-deploy.yml@main
 
   ecs-deploy:
-    uses: aluri-hidup/reusable-workflow/.github/workflows/.ecs-nonprod-deploy.yml
+    uses: aluri-hidup/reusable-workflow/.github/workflows/.ecs-nonprod-deploy.yml@main
       
         
 
