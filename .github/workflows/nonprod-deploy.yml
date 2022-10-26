@@ -13,10 +13,15 @@ on:
 jobs:
   init:
     uses: naluri-hidup/reusable-workflows/.github/workflows/.init-nonprod-deploy.yml@main 
+    secrets:
+      SLACK_DEPLOYMENT_WEBHOOK: ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
 
   ecs-deploy:
     needs: init
     uses: naluri-hidup/reusable-workflows/.github/workflows/.ecs-nonprod-deploy.yml@main
-      
+    secrets:
+      GH_ACTIONS_ACCESS_KEY_ID: ${{ secrets.GH_ACTIONS_ACCESS_KEY_ID }}
+      GH_ACTIONS_SECRET_ACCESS_KEY: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
+      GH_ACTIONS_REGION: ${{ secrets.GH_ACTIONS_REGION }}
         
 
