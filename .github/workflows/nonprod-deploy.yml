@@ -11,14 +11,11 @@ on:
         default: "staging"
 
 jobs:
-  nonprod-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Init
-        uses: naluri-hidup/reusable-workflow/.github/workflows/.init-nonprod-deploy.yml
+  init:
+    uses: naluri-hidup/reusable-workflow/.github/workflows/.init-nonprod-deploy.yml
 
-      - name: ECS deployment
-        uses: aluri-hidup/reusable-workflow/.github/workflows/.ecs-nonprod-deploy.yml
+  ecs-deploy:
+    uses: aluri-hidup/reusable-workflow/.github/workflows/.ecs-nonprod-deploy.yml
       
         
 
