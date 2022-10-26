@@ -26,7 +26,7 @@ jobs:
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_branch.outputs.value }} to deployment to ${{ step.set_deploy_env.outputs.value }} by *@${{ github.actor }}*: `started`"}' \
+          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_branch.outputs.value }} to deployment to ${{ steps.set_deploy_env.outputs.value }} by *@${{ github.actor }}*: `started`"}' \
           ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
     
       - name: Checkout Code
