@@ -31,4 +31,7 @@ jobs:
           curl -X POST -H 'Content-type: application/json' \
           --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_branch.outputs.value }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
           ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+    
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
