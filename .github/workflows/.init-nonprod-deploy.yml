@@ -14,24 +14,30 @@ on:
 jobs:
   init-nonprod-deploy:
     runs-on: ubuntu-latest
+    outputs:
+      git_branch: ${{ steps.set_git_branch.value }}
+      git_sha_short: ${{ steps.set_git_sha_short.value }}
+      deploy_env: ${{ steps.set_deploy_env.value }}
     steps:
-      - name: Set branch
-        id: set_branch
+      - name: Set git branch
+        id: set_git_branch
         shell: bash
         run: echo "::set-output name=value::$(echo ${GITHUB_REF#refs/heads/})"
 
-      - name: Set Deploy Environment
+      - name: Set git sha short
+        id: set_git_sha_short
+        shell: bash
+        run: echo "::set-output name=value::$(echo ${GITHUB_SHA::7})"
+
+      - name: Set deploy env
         id: set_deploy_env
         run: |
           DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
           echo "::set-output name=value::${DEPLOY_ENV:-"staging"}"
 
-      - name: Check outputs
-        run: echo ${GITHUB_SHA::7}
-
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_branch.outputs.value }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
+          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_git_branch.outputs.value }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
           ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
 

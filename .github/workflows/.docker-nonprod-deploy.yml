@@ -12,17 +12,20 @@ on:
       FOUNDATION_ACCESS_TOKEN:
         required: true
     inputs:
-      deploy_env:
-        required: false
-        type: string
-        default: "staging"
       builder_cache:
         required: false
         type: boolean
         default: false
+      deploy_env:
+        required: true
+        type: string
       ecr_name:
         required: true
         type: string
+      git_sha_short:
+        required: true
+        tyep: string
+
 jobs:
   docker-bake: 
     runs-on: ubuntu-latest
@@ -52,12 +55,12 @@ jobs:
           if [[ ${{ inputs.builder_cache }} == false ]]; then
 
             docker buildx build \
-            --build-arg COMMIT_SHA=$GITHUB_SHA_SHORT \
+            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:$GITHUB_SHA_SHORT .
-            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:$GITHUB_SHA_SHORT" 
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
 
           else 
             docker pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
@@ -65,7 +68,7 @@ jobs:
             docker buildx build \
             --target builder \
             --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }}:builder \
-            --build-arg COMMIT_SHA=$GITHUB_SHA_SHORT \
+            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
@@ -73,10 +76,10 @@ jobs:
 
             docker buildx build \
             --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }}:builder \
-            --build-arg COMMIT_SHA=$GITHUB_SHA_SHORT \
+            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:$GITHUB_SHA_SHORT .
-            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:$GITHUB_SHA_SHORT" 
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
           fi
