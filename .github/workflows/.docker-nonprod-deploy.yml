@@ -60,7 +60,7 @@ jobs:
             echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:$GITHUB_SHA_SHORT" 
 
           else 
-            docker buildx pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
+            docker pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
 
             docker buildx build \
             --target builder \
