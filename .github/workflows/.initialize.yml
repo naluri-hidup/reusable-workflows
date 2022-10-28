@@ -15,9 +15,9 @@ jobs:
   initialize:
     runs-on: ubuntu-latest
     outputs:
-      git_branch: ${{ steps.set_git_branch.value }}
-      git_sha_short: ${{ steps.set_git_sha_short.value }}
-      deploy_env: ${{ steps.set_deploy_env.value }}
+      git_branch: ${{ steps.set_git_branch.outputs.value }}
+      git_sha_short: ${{ steps.set_git_sha_short.outputs.value }}
+      deploy_env: ${{ steps.set_deploy_env.outputs.value }}
     steps:
       - name: Set git branch
         id: set_git_branch
