@@ -10,7 +10,13 @@ on:
         required: false
         type: string
         default: 'staging'
-        
+    outputs:
+      git_branch:
+        value: ${{ jobs.initialize.outputs.git_branch }}
+      git_sha_short: 
+        value: ${{ jobs.initialize.outputs.git_sha_short }}
+      deploy_env:
+        value: ${{ jobs.initialize.outputs.deploy_env }}
 jobs:
   initialize:
     runs-on: ubuntu-latest
@@ -29,9 +35,6 @@ jobs:
         shell: bash
         run: echo "::set-output name=value::$(echo ${GITHUB_SHA::7})"
 
-      - name: Echo git sha short
-        run : echo ${{ steps.set_git_sha_short.outputs.value }}
-        
       - name: Set deploy env
         id: set_deploy_env
         run: |
