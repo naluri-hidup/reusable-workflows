@@ -26,12 +26,8 @@ jobs:
           DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
           echo "::set-output name=value::${DEPLOY_ENV:-"staging"}"
 
-      - name: Set outputs
-        id: vars
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
-        
       - name: Check outputs
-        run: echo ${{ steps.vars.outputs.sha_short }}
+        run: echo ${GITHUB_SHA::7}
 
       - name: Slack Notification
         run: |
