@@ -9,6 +9,8 @@ on:
         required: true
       GH_ACTIONS_REGION:
         required: true
+      FOUNDATION_ACCESS_TOKEN:
+        required: true
     inputs:
       deploy_env:
         required: false
