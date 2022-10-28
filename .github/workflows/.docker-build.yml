@@ -27,7 +27,7 @@ on:
         type: string
 
 jobs:
-  docker-bake: 
+  docker-build: 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
