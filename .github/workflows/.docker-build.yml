@@ -53,7 +53,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           if [[ ${{ inputs.builder_cache }} == false ]]; then
-
+            echo "Git sha ${{ inputs.git_sha_short }}"
+            
             docker buildx build \
             --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
