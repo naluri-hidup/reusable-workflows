@@ -29,6 +29,9 @@ jobs:
         shell: bash
         run: echo "::set-output name=value::$(echo ${GITHUB_SHA::7})"
 
+      - name: Echo git sha short
+        run : echo ${{ steps.set_git_sha_short.outputs.value }}
+        
       - name: Set deploy env
         id: set_deploy_env
         run: |
