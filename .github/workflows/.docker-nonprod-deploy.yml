@@ -49,7 +49,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          if [[ "${{ inputs.builder }}" == false ]]; then
+          if [[ ${{ inputs.builder }} == false ]]; then
 
             docker buildx build \
             --build-arg COMMIT_SHA=$GITHUB_SHA_SHORT \
