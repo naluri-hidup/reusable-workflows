@@ -24,7 +24,7 @@ on:
         type: string
       git_sha_short:
         required: true
-        tyep: string
+        type: string
 
 jobs:
   docker-bake: 
