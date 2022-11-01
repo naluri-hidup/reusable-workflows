@@ -1,0 +1,58 @@
+name: Workflow update ECS task definition
+
+on:
+  workflow_call:
+    secrets:
+      GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
+      GH_ACTIONS_REGION:
+        required: true
+    inputs:
+      deploy_env:
+        required: true
+        type: string
+      ecr_image:
+        required: true
+        type: string
+jobs:
+  ecs-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: main
+      
+      - name: Checkout reusable
+        uses: actions/checkout@v3
+        with:
+          repository: naluri-hidup/reusable-workflows
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.GH_ACTIONS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.GH_ACTIONS_REGION }}
+      
+      # - name: Set definition as environment
+      #   run : |
+      #     set -a;
+      #     eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("definition.yml"))["staging"]["ecs"].items()]))');
+      #     set a+;
+
+
+      - name: ECS deployment
+        run: |
+          VERSION=v4.2.0
+          BINARY=yq_linux_amd64
+          wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && mv ${BINARY} /usr/bin/yq
+
+          yq e -j main/${{ inputs.deploy_env }}/task-definition.yml > main/${{ inputs.deploy_env }}/temp-task-definition.json
+          cat main/${{ inputs.deploy_env }}/temp-task-definition.json | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > main/${{ inputs.deploy_env }}/task-definition.json
+          aws ecs register-task-definition --family $TASK_DEFINITION --region="ap-southeast-1" --cli-input-json file://main/${{ inputs.deploy_env }}/task-definition.json
+
+          TASK_REVISION=`aws ecs describe-task-definition --task-definition $TASK_DEFINITION | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
+          aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$TASK_REVISION

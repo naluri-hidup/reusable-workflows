@@ -1,0 +1,24 @@
+family: stag-naluri-web-sso
+executionRoleArn: $execution_role_name
+taskRoleArn: ""
+volumes: []
+placementConstraints: []
+networkMode: bridge
+requiresCompatibilities:
+  - EC2
+containerDefinitions:
+  - name: $task_definition_name
+    image: 502605353565.dkr.ecr.ap-southeast-1.amazonaws.com/naluri-web-sso:$commit_hash
+    cpu: 0
+    memory: 256
+    portMappings:
+      - containerPort: 3000
+        hostPort: 0
+        protocol: tcp
+    essential: true
+    environment: []
+    mountPoints: []
+    volumesFrom: []
+    secrets: []
+    entryPoint: []
+    command: []

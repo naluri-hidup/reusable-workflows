@@ -11,11 +11,14 @@ on:
         required: true
       FOUNDATION_ACCESS_TOKEN:
         required: true
-    inputs:
+    inputs: 
       builder_cache:
         required: false
         type: boolean
         default: false
+      git_branch:
+        required: true
+        type: string
       deploy_env:
         required: true
         type: string
@@ -25,13 +28,18 @@ on:
       git_sha_short:
         required: true
         type: string
-
+    outputs:
+      ecr_image:
+        value: ${{ jobs.docker-build.outputs.ecr_image }}
 jobs:
   docker-build: 
     runs-on: ubuntu-latest
+    outputs:
+      ecr_image: ${{ steps.build-image.outputs.ecr_image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        ref: ${{ inputs.git_branch }}
         
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -60,7 +68,7 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
+            echo "::set-output name=ecr_image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
 
           else 
             docker pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
@@ -81,5 +89,5 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-            echo "::set-output name=image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
+            echo "::set-output name=ecr_image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
           fi
