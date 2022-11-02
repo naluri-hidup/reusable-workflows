@@ -29,6 +29,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: naluri-hidup/reusable-workflows
+          path: template
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -42,7 +43,7 @@ jobs:
           pip install pathlib
           pip install ruamel.yaml
           set -a;
-          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("definition.yml"))["staging"]["ecs"].items()]))');
+          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("template/definition.yml"))["staging"]["ecs"].items()]))');
           set a+;
 
       - name: Display the env
