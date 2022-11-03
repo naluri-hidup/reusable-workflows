@@ -12,7 +12,7 @@ dir_path = os.getcwd()
 print(dir_path + '/template/ecs-td-template/' + args.template + '.yml')
 
 # Use the task definition template
-env = EnvYAML(dir_path + '/template/ecs-td-template/' + args.template + '.yml')
+# env = EnvYAML(dir_path + '/template/ecs-td-template/' + args.template + '.yml')
 print(dir_path + '/task-definition.yml')
 
 # with open(dir_path + '/task-definition.yml', "w", encoding = "utf-8") as yaml_file:
