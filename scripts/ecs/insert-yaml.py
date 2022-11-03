@@ -18,8 +18,8 @@ with open(dir_path + "/" + args.destination) as ad:
 with open(dir_path + "/" + args.source) as ad:
     data2 = yaml.load(ad)
 
-data['task-definition']['containerDefinitions'][0]['environment'] = data2['prod']['environment']
-data['task-definition']['containerDefinitions'][0]['secrets'] = data2['prod']['secrets']
+data['containerDefinitions'][0]['environment'] = data2[args.environment]['environment']
+data['containerDefinitions'][0]['secrets'] = data2[args.environment]['secrets']
 
 with open(dir_path + "/" + args.output, "w", encoding = "utf-8") as yaml_file:
     dump = ruamel.yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper)
