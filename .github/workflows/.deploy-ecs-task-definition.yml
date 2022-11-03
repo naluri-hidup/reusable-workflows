@@ -45,8 +45,8 @@ jobs:
           pip install ruamel.yaml
           pip install envyaml
 
-          export env=${{ inputs.deploy_env }}
-          export image_name=${{ inputs.ecr_image }}
+          export env="${{ inputs.deploy_env }}"
+          export image_name="${{ inputs.ecr_image }}"
 
           ## Make the definition into Environment variables
           set -a;
@@ -57,7 +57,6 @@ jobs:
           if [[ -z ${task_role_name} ]]; then
             export task_role_name='""'
           fi
-          
 
           ## For Ecs Update
           echo "::set-output name=task_definition_name::$task_definition_name"
