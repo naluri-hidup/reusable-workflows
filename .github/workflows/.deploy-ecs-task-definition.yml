@@ -83,7 +83,7 @@ jobs:
           else
             path=main/${{ inputs.deploy_env }}/task-definition.json
           fi
-          cat task-definition.json
+          cat $path
           
           cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
 
