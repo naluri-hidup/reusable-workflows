@@ -78,11 +78,11 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && sudo mv ${BINARY} /usr/bin/yq
 
           if [[ ${{ steps.generate.outputs.use_ecs_template }} == true ]]; then
-            echo "yes"
             yq e -j task-definition.yml > task-definition.json
+            echo "yes"
+            cat task-definition.json
             path="task-definition.json"
           else
-            echo "no"
             path="main/${{ inputs.deploy_env }}/task-definition.json"
           fi
 
