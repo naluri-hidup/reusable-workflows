@@ -1,0 +1,35 @@
+family: stag-naluri-web-sso
+executionRoleArn: stag-naluri-coreTaskExecutionRole
+taskRoleArn: ''
+volumes: []
+placementConstraints: []
+networkMode: bridge
+requiresCompatibilities:
+- EC2
+containerDefinitions:
+- name: stag-naluri-web-sso
+  image: naluri-web-sso
+  cpu: 0
+  memory: 256
+  portMappings:
+  - containerPort: 3000
+    hostPort: 0
+    protocol: tcp
+  essential: true
+  environment: []
+  mountPoints: []
+  volumesFrom: []
+  secrets: []
+  entryPoint: []
+  command: []
+  dockerLabels:
+    com.datadoghq.tags.env: staaging
+    com.datadoghq.tags.service: stag-naluri-web-sso
+    com.datadoghq.tags.version: "1.0"
+  logConfiguration:
+    secretOptions: []
+    logDriver: awslogs
+    options:
+      awslogs-group: ecs/stag-naluri-web-sso
+      awslogs-region: ap-southeast-1
+      awslogs-stream-prefix: stag-naluri-web-sso-log-stream
