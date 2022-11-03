@@ -9,12 +9,14 @@ arg_parser.add_argument('-t', '--template')
 args = arg_parser.parse_args()
 
 dir_path = os.getcwd()
+print(dir_path + '/template/ecs-td-template/' + args.template + '.yml')
+
 # Use the task definition template
 env = EnvYAML(dir_path + '/template/ecs-td-template/' + args.template + '.yml')
+print(dir_path + '/task-definition.yml')
 
+# with open(dir_path + '/task-definition.yml', "w", encoding = "utf-8") as yaml_file:
+#     dump = ruamel.yaml.dump(env['task-definition'], Dumper=ruamel.yaml.RoundTripDumper)
+#     yaml_file.write(dump)
 
-with open(dir_path + '/task-definition.yml', "w", encoding = "utf-8") as yaml_file:
-    dump = ruamel.yaml.dump(env['task-definition'], Dumper=ruamel.yaml.RoundTripDumper)
-    yaml_file.write(dump)
-
-print(env['task-definition'])
+# print(env['task-definition'])
