@@ -70,17 +70,13 @@ jobs:
             echo "::set-output name=use_ecs_template::true"
             python3 template/scripts/env-yaml.py -t ${task_definition_template}
           fi
-          pwd
-          cat task-definition.yml
 
       - name: ECS deployment
         run: |
           VERSION=v4.2.0
           BINARY=yq_linux_amd64
           wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && sudo mv ${BINARY} /usr/bin/yq
-          pwd
-          cat task-definition.yml
-          
+
           if [[ ${{ steps.generate.outputs.use_ecs_template == true }} ]]; then
             yq e -j task-definition.yml > task-definition.json
             path="task-definition.json"
@@ -89,7 +85,8 @@ jobs:
           fi
 
           cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
-          
+
+          cat task-definition.json
           # aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$path
 
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
