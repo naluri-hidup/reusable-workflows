@@ -58,7 +58,12 @@ jobs:
             export task_role_name='""'
           fi
 
-         
+          ## For Ecs Update
+          echo "::set-output name=task_definition_name::$task_definition_name"
+          echo "::set-output name=cluster_name::$cluster_name"
+          echo "::set-output name=service_name::$service_name"
+
+
           
       # - name: ECS deployment
       #   run: |
