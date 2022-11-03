@@ -90,10 +90,8 @@ jobs:
           #   --build-arg APP_ENV=${{ inputs.deploy_env }} \
           #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
           # fi
-
-          ecr_path=$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
-
-          echo "ecr_image=$(echo $ecr_path)" >> $GITHUB_OUTPUT
+          
+          echo "ecr_image=$(echo $ECR_REGISTRY)" >> $GITHUB_OUTPUT
     
       - name: Output
         run: |
