@@ -13,7 +13,10 @@ on:
       deploy_env:
         required: true
         type: string
-      ecr_image:
+      ecr_name:
+        required: true
+        type: string
+      git_sha_short:
         required: true
         type: string
 jobs:
@@ -38,15 +41,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.GH_ACTIONS_REGION }}
       
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
       - name: Generate Task Definition
         id: generate
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run : |
           pip install pathlib
           pip install ruamel.yaml
           pip install envyaml
 
           export env="${{ inputs.deploy_env }}"
-          export image_name="${{ inputs.ecr_image }}"
 
           ## Make the definition into Environment variables
           set -a;
@@ -85,8 +93,9 @@ jobs:
           else
             path=main/${{ inputs.deploy_env }}/task-definition.json
           fi
-
-          cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $final_path
+          
+          image_name="$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}"
+          cat $path | jq '.containerDefinitions[0].image='\"${image_name}\" > $final_path
 
           aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$final_path
 
