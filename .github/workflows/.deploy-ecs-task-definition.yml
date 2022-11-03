@@ -78,7 +78,7 @@ jobs:
           wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && sudo mv ${BINARY} /usr/bin/yq
 
           final_path=actual-task-definition.json
-          
+
           if [[ ${{ steps.generate.outputs.use_ecs_template }} == true ]]; then
             yq e -j task-definition.yml > task-definition.json
             path=task-definition.json
@@ -87,8 +87,8 @@ jobs:
           fi
 
           cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $final_path
-          cat $final_path
-          # aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$(pwd)"/"$path
+
+          aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$final_path
 
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
           # aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
