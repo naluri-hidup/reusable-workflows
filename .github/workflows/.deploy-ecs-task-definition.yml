@@ -63,7 +63,13 @@ jobs:
           echo "::set-output name=cluster_name::$cluster_name"
           echo "::set-output name=service_name::$service_name"
 
-
+          ## Generate Task definition
+          if [[ -z ${task_definition_template} ]]; then
+            echo "::set-output name=use_ecs_template::false" 
+          else
+            echo "::set-output name=use_ecs_template::true"
+            python3 template/scripts/env-yaml.py -t ${task_definition_template}
+          if
           
       # - name: ECS deployment
       #   run: |
