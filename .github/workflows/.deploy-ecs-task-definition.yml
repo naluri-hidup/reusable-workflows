@@ -83,11 +83,10 @@ jobs:
           else
             path=main/${{ inputs.deploy_env }}/task-definition.json
           fi
-          cat $path
-          
-          cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
 
-          # aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$(pwd)"/"$path
+          cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
+          cat $path
+          aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$(pwd)"/"$path
 
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
           # aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
