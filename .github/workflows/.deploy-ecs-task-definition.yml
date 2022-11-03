@@ -70,7 +70,7 @@ jobs:
             echo "::set-output name=use_ecs_template::true"
             python3 template/scripts/env-yaml.py -t ${task_definition_template}
           fi
-
+          pwd
           echo task-definition.json
 
       - name: ECS deployment
@@ -78,7 +78,7 @@ jobs:
           VERSION=v4.2.0
           BINARY=yq_linux_amd64
           wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && sudo mv ${BINARY} /usr/bin/yq
-
+          pwd
           echo task-definition.json
           if [[ ${{ steps.generate.outputs.use_ecs_template == true }} ]]; then
             yq e -j task-definition.yml > task-definition.json
