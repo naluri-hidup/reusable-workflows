@@ -65,9 +65,9 @@ jobs:
 
           ## Generate Task definition
           if [[ -z ${task_definition_template} ]]; then
-            echo "::set-output name=use_ecs_template::false";
+            echo "no"
           else
-            echo "::set-output name=use_ecs_template::true";
+            echo "yes"
             python3 template/scripts/env-yaml.py -t ${task_definition_template}
           if
       # - name: ECS deployment
