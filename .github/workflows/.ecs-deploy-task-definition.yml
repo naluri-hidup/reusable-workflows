@@ -76,7 +76,8 @@ jobs:
             echo "::set-output name=use_ecs_template::false"
           else
             echo "::set-output name=use_ecs_template::true"
-            python3 template/scripts/ecs/env-yaml.py -t 'template/ecs-td-template/${task_definition_template}.yml' -o task_definition.yml
+            filepath="template/ecs-td-template/${task_definition_template}.yml"
+            python3 template/scripts/ecs/env-yaml.py -t $filepath -o task_definition.yml
             python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task_definition.yml -o task_definition.yml
             cat task_definition.yml
           fi
@@ -92,14 +93,14 @@ jobs:
           ## To json
           if [[ ${{ steps.generate.outputs.use_ecs_template }} == true ]]; then
             yq e -j task-definition.yml > task-definition.json
-            path=task-definition.json
+            filepath=task-definition.json
           else
-            path=main/${{ inputs.deploy_env }}/task-definition.json
+            filepath=main/${{ inputs.deploy_env }}/task-definition.json
           fi
 
           ## Image hash/tag
           image_name="$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}"
-          cat $path | jq '.containerDefinitions[0].image='\"${image_name}\" > $final_path
+          cat $filepath | jq '.containerDefinitions[0].image='\"${image_name}\" > $final_path
 
           ## Add TD
           aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$final_path
