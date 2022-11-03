@@ -56,7 +56,7 @@ jobs:
           printenv
 
           python3 template/script/env-yaml.py
-
+          cat after.yml
 
 
       # - name: ECS deployment
