@@ -95,7 +95,7 @@ jobs:
             yq e -j task-definition.yml > task-definition.json
             filepath=task-definition.json
           else
-            filepath=main/${{ inputs.deploy_env }}/task-definition.json
+            filepath=main/deployment/${{ inputs.deploy_env }}/task-definition.json
           fi
 
           ## Image hash/tag
