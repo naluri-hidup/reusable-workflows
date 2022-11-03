@@ -92,7 +92,7 @@ jobs:
           # fi
 
           ecr_path=$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
-          echo "{ecr_image}={$ecr_path}" >> $GITHUB_OUTPUT
+          echo "ecr_image=$ecr_path" >> $GITHUB_OUTPUT
     
       - name: Output
         run: |
