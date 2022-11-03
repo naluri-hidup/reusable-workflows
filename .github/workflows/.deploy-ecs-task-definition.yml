@@ -50,13 +50,12 @@ jobs:
           if [[ -z ${task_role_name} ]]; then
             export task_role_name='""'
           fi
-          
           export env=${{ inputs.deploy_env }}
           export image_name=${{ inputs.ecr_image }}
 
           printenv
 
-          python3 template/script/env-yaml.py
+          python3 template/scripts/env-yaml.py
           cat after.yml
 
       # - name: ECS deployment
