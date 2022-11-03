@@ -77,9 +77,9 @@ jobs:
           else
             echo "::set-output name=use_ecs_template::true"
             filepath="template/ecs-td-template/${task_definition_template}.yml"
-            python3 template/scripts/ecs/env-yaml.py -t $filepath -o task_definition.yml
-            python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task_definition.yml -o task_definition.yml
-            cat task_definition.yml
+            python3 template/scripts/ecs/env-yaml.py -t $filepath -o task-definition.yml
+            python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task-definition.yml -o task-definition.yml
+            cat task-definition.yml
           fi
 
       - name: ECS deployment
