@@ -48,7 +48,7 @@ jobs:
           set a+;
 
           if [[ -z ${task_role_name} ]]; then
-            export task_role_name=""
+            export task_role_name='""'
           
           export env=${{ inputs.deploy_env }}
           export image_name=${{ inputs.ecr_image }}
