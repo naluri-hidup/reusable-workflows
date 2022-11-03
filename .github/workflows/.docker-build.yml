@@ -53,8 +53,8 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v2
 
       - name: Build image
         id: build_image
@@ -91,9 +91,9 @@ jobs:
           #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
           # fi
 
-          # ecr_path=$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
+          ecr_path=$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
 
-          echo "ecr_image=$(echo 'test')" >> $GITHUB_OUTPUT
+          echo "ecr_image=$(echo $ecr_path)" >> $GITHUB_OUTPUT
     
       - name: Output
         run: |
