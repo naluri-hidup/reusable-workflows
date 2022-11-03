@@ -47,16 +47,7 @@ jobs:
           eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("main/deployment/definition.yml"))["staging"]["ecs"].items()]))');
           set a+;
 
-          if [[ -z ${task_role_name} ]]; then
-            export task_role_name='""'
-          
-          export env=${{ inputs.deploy_env }}
-          export image_name=${{ inputs.ecr_image }}
 
-          printenv
-
-          python3 template/script/env-yaml.py
-          cat after.yml
 
 
       # - name: ECS deployment
