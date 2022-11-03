@@ -79,9 +79,9 @@ jobs:
 
           if [[ ${{ steps.generate.outputs.use_ecs_template == true }} ]]; then
             yq e -j task-definition.yml > task-definition.json
-            path = "task-definition.json"
+            path="task-definition.json"
           else
-            path = "main/${{ inputs.deploy_env }}/task-definition.json"
+            path="main/${{ inputs.deploy_env }}/task-definition.json"
           fi
 
           cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
