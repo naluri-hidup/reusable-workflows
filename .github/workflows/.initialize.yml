@@ -28,18 +28,18 @@ jobs:
       - name: Set git branch
         id: set_git_branch
         shell: bash
-        run: echo "::set-output name=value::$(echo ${GITHUB_REF#refs/heads/})"
+        run: echo "{value}={$(echo ${GITHUB_REF#refs/heads/})}" >> $GITHUB_OUTPUT 
 
       - name: Set git sha short
         id: set_git_sha_short
         shell: bash
-        run: echo "::set-output name=value::$(echo ${GITHUB_SHA::7})"
+        run: echo "{value}={$(echo ${GITHUB_SHA::7})}" >> $GITHUB_OUTPUT 
 
       - name: Set deploy env
         id: set_deploy_env
         run: |
           DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
-          echo "::set-output name=value::${DEPLOY_ENV:-"staging"}"
+          echo "{value}={${DEPLOY_ENV:-"staging"}}" >> $GITHUB_OUTPUT 
 
       - name: Slack Notification
         run: |

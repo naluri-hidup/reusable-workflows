@@ -69,7 +69,6 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-            echo "::set-output name=ecr_image::$(echo $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }})" 
 
           else 
             docker pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
@@ -90,5 +89,11 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-            echo "::set-output name=ecr_image::$(echo $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }})" 
           fi
+
+          ecr_path=$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
+          echo "{ecr_image}={$ecr_path}" >> $GITHUB_OUTPUT
+    
+      - name: Output
+        run: |
+          echo ${{ steps.build_image.outputs.ecr_image }}
