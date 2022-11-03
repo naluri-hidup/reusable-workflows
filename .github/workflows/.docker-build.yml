@@ -71,6 +71,7 @@ jobs:
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
             echo "::set-output name=ecr_image::$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}" 
 
+            echo $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}
           else 
             docker pull $ECR_REGISTRY/${{ inputs.ecr_name }}:builder || true
 
