@@ -23,10 +23,6 @@ task-definition:
       secrets: []
       entryPoint: []
       command: []
-      dockerLabels:
-        com.datadoghq.tags.env: ${env}
-        com.datadoghq.tags.service: ${task_definition_name}
-        com.datadoghq.tags.version: "${build_version}"
       logConfiguration:
         secretOptions: []
         logDriver: awslogs

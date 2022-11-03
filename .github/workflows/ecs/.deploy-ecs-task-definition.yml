@@ -76,7 +76,9 @@ jobs:
             echo "::set-output name=use_ecs_template::false"
           else
             echo "::set-output name=use_ecs_template::true"
-            python3 template/scripts/env-yaml.py -t ${task_definition_template}
+            python3 template/scripts/ecs/env-yaml.py -t 'template/ecs-td-template/${task_definition_template}.yml' -o task_definition.yml
+            python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task_definition.yml -o task_definition.yml
+            cat task_definition.yml
           fi
 
       - name: ECS deployment
@@ -104,4 +106,4 @@ jobs:
 
           ## Update service
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
-          aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
+          # aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION

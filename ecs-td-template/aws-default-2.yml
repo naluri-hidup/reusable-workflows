@@ -1,0 +1,29 @@
+task-definition:
+  family: ${task_definition_name}
+  executionRoleArn: ${execution_role_name}
+  taskRoleArn: ${task_role_name}
+  volumes: []
+  placementConstraints: []
+  networkMode: bridge
+  requiresCompatibilities:
+    - EC2
+  containerDefinitions:
+    - name: ${task_definition_name}
+      image: dummy
+      cpu: ${cpu}
+      memory: ${memory}
+      portMappings:
+        - containerPort: ${containerPort}
+          hostPort: ${hostPort}
+          protocol: ${protocol}
+      essential: true
+      environment: []
+      mountPoints: []
+      volumesFrom: []
+      secrets: []
+      entryPoint: []
+      command: []
+      dockerLabels:
+        com.datadoghq.tags.env: ${env}
+        com.datadoghq.tags.service: ${task_definition_name}
+        com.datadoghq.tags.version: "${build_version}"
