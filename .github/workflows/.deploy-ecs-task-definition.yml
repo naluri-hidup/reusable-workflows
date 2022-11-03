@@ -38,7 +38,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.GH_ACTIONS_REGION }}
       
-      - name: Set definition as environment
+      - name: Generate Task Definition
+        id: generate
         run : |
           pip install pathlib
           pip install ruamel.yaml
@@ -47,28 +48,47 @@ jobs:
           export env=${{ inputs.deploy_env }}
           export image_name=${{ inputs.ecr_image }}
 
+          ## Make the definition into Environment variables
           set -a;
           eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; import os; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("main/deployment/definition.yml"))[os.environ["env"]]["ecs"].items()]))');
           set a+;
 
+          ## For Setting default value
           if [[ -z ${task_role_name} ]]; then
             export task_role_name='""'
           fi
           
-          printenv
 
-          python3 template/scripts/env-yaml.py -t ${task_definition_template}
-          cat after.yml
+          ## For Ecs Update
+          echo "::set-output name=task_definition_name::$task_definition_name"
+          echo "::set-output name=cluster_name::$cluster_name"
+          echo "::set-output name=service_name::$service_name"
 
-      # - name: ECS deployment
-      #   run: |
-      #     VERSION=v4.2.0
-      #     BINARY=yq_linux_amd64
-      #     wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && mv ${BINARY} /usr/bin/yq
 
-      #     yq e -j main/${{ inputs.deploy_env }}/task-definition.yml > main/${{ inputs.deploy_env }}/temp-task-definition.json
-      #     cat main/${{ inputs.deploy_env }}/temp-task-definition.json | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > main/${{ inputs.deploy_env }}/task-definition.json
-      #     aws ecs register-task-definition --family $TASK_DEFINITION --region="ap-southeast-1" --cli-input-json file://main/${{ inputs.deploy_env }}/task-definition.json
+          ## Generate Task definition
+          if [[ -z ${task_definition_template} ]]; then
+            echo "::set-output name=use_ecs_template::false" 
+          else
+            echo "::set-output name=use_ecs_template::true"
+            python3 template/scripts/env-yaml.py -t ${task_definition_template}
+          if
+          
+      - name: ECS deployment
+        run: |
+          VERSION=v4.2.0
+          BINARY=yq_linux_amd64
+          wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && mv ${BINARY} /usr/bin/yq
 
-      #     TASK_REVISION=`aws ecs describe-task-definition --task-definition $TASK_DEFINITION | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
-      #     aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$TASK_REVISION
+          if [[ ${{ steps.generate.outputs.use_ecs_template == "true" }} ]]; then
+            yq e -j task-definition.yml > task-definition.json
+            path = "task-definition.json"
+          else
+            path = "main/${{ inputs.deploy_env }}/task-definition.json"
+          fi
+
+          cat $path | jq '.containerDefinitions[0].image='\"${{ inputs.ecr_image }}\" > $path
+          aws ecs register-task-definition --family ${{ steps.generate.outputs.task_definition_name }} --region="ap-southeast-1" --cli-input-json file://$path
+
+          TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
+          echo $TASK_REVISION
+          # aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
