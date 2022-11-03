@@ -7,6 +7,8 @@ arg_parser.add_argument('-e', '--environment')
 arg_parser.add_argument('-s', '--source')
 arg_parser.add_argument('-d', '--destination')
 arg_parser.add_argument('-o', '--output')
+
+args = arg_parser.parse_args()
 yaml = ruamel.yaml.YAML()
 dir_path = os.getcwd()
 
