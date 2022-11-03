@@ -43,19 +43,21 @@ jobs:
           pip install pathlib
           pip install ruamel.yaml
           pip install envyaml
+
+          export env=${{ inputs.deploy_env }}
+          export image_name=${{ inputs.ecr_image }}
+
           set -a;
-          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("main/deployment/definition.yml"))["staging"]["ecs"].items()]))');
+          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; import os; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("main/deployment/definition.yml"))[os.environ["env"]]["ecs"].items()]))');
           set a+;
 
           if [[ -z ${task_role_name} ]]; then
             export task_role_name='""'
           fi
-          export env=${{ inputs.deploy_env }}
-          export image_name=${{ inputs.ecr_image }}
-
+          
           printenv
 
-          python3 template/scripts/env-yaml.py
+          python3 template/scripts/env-yaml.py -t ${task_definition_template}
           cat after.yml
 
       # - name: ECS deployment
