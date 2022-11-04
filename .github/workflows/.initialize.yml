@@ -31,7 +31,7 @@ jobs:
         run: | 
           TAG="${GITHUB_REF#refs/tags/}"
           echo $TAG
-          if [[ $TAG == "ref/heads/"* ]]; then
+          if [[ $TAG == "refs/heads/"* ]]; then
             echo "no tag"
             echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
           else
