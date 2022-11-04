@@ -21,26 +21,23 @@ jobs:
   initialize:
     runs-on: ubuntu-latest
     outputs:
-      git_branch: ${{ steps.set_git_branch.outputs.value }}
-      git_sha_short: ${{ steps.set_git_sha_short.outputs.value }}
+      git_branch: ${{ steps.set_git_var.outputs.git_branch }}
+      git_sha_short: ${{ steps.set_git_var.outputs.git_sha_short }}
       deploy_env: ${{ steps.set_deploy_env.outputs.value }}
     steps:
       - name: Set git branch
-        id: set_git_branch
+        id: set_git_var
         shell: bash
         run: | 
           TAG="${GITHUB_REF#refs/tags/}"
           if [[ $TAG == "refs/heads/"* ]]; then
-            echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
+            echo "git_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
+            echo "git_sha_short=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT 
           else
-            echo "value=$(echo $TAG)" >> $GITHUB_OUTPUT
+            echo "git_branch=$(echo $TAG)" >> $GITHUB_OUTPUT
+            echo "git_sha_short=$(echo $TAG)" >> $GITHUB_OUTPUT
           fi
           
-      - name: Set git sha short
-        id: set_git_sha_short
-        shell: bash
-        run: echo "value=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT 
-
       - name: Set deploy env
         id: set_deploy_env
         run: |
@@ -50,6 +47,6 @@ jobs:
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_git_branch.outputs.value }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
+          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_git_var.outputs.git_branch }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
           ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
 
