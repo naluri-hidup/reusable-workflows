@@ -28,7 +28,9 @@ jobs:
       - name: Set git branch
         id: set_git_branch
         shell: bash
-        run: echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
+        run: | 
+          echo "GIT_TAG=`echo $(git describe --tags --abbrev=0)`"
+          echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
 
       - name: Set git sha short
         id: set_git_sha_short
