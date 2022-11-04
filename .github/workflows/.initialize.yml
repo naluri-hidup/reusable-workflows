@@ -31,10 +31,13 @@ jobs:
         run: | 
           TAG="${GITHUB_REF#refs/*/}"
           if [[ -z $TAG ]]; then
+            echo "GOT tag"
             echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
           else
             echo "value=$(echo $TAG)" >> $GITHUB_OUTPUT
+            echo "NO TAG"
           fi
+
 
       - name: Set git sha short
         id: set_git_sha_short
