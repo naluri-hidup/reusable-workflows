@@ -30,13 +30,13 @@ jobs:
         shell: bash
         run: | 
           TAG="${GITHUB_REF#refs/tags/}"
-          echo $TAG
-          if [[ -z $TAG ]]; then
-            echo "GOT tag"
+
+          if [[ $TAG == *"/ref/heads/" ]]; then
+            echo "no tag"
             echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
           else
             echo "value=$(echo $TAG)" >> $GITHUB_OUTPUT
-            echo "NO TAG"
+            echo "got TAG"
           fi
 
 
