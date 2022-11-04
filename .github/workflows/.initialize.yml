@@ -29,8 +29,12 @@ jobs:
         id: set_git_branch
         shell: bash
         run: | 
-          echo "${GITHUB_REF#refs/*/}"
-          echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
+          TAG="${GITHUB_REF#refs/*/}"
+          if [[ -z $TAG ]]; then
+            echo "value=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
+          else
+            echo "value=$(echo $TAG)" >> $GITHUB_OUTPUT
+          fi
 
       - name: Set git sha short
         id: set_git_sha_short
