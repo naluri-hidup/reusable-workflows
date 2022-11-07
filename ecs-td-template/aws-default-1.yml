@@ -27,6 +27,6 @@ task-definition:
         secretOptions: []
         logDriver: awslogs
         options:
-          awslogs-group: ecs/${task_definition_name}
+          awslogs-group: /ecs/${task_definition_name}
           awslogs-region: ap-southeast-1
           awslogs-stream-prefix: ${task_definition_name}-log-stream

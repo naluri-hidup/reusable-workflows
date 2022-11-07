@@ -1,0 +1,109 @@
+task-definition:
+  family: ${task_definition_name}
+  executionRoleArn: ${execution_role_name}
+  taskRoleArn: ${task_role_name}
+  volumes:
+    - name: "docker_sock"
+      fsxWindowsFileServerVolumeConfiguration: null
+      efsVolumeConfiguration: null
+      dockerVolumeConfiguration: null
+      hosts:
+        sourcePath: "/var/run/docker.sock"
+    - name: "proc"
+      fsxWindowsFileServerVolumeConfiguration: null
+      efsVolumeConfiguration: null
+      dockerVolumeConfiguration: null
+      hosts:
+        sourcePath: "/proc"
+    - name: "cgroup"
+      fsxWindowsFileServerVolumeConfiguration: null
+      efsVolumeConfiguration: null
+      dockerVolumeConfiguration: null
+      hosts:
+        sourcePath: "/sys/fs/cgroup/"
+    - name: "pointdir"
+      fsxWindowsFileServerVolumeConfiguration: null
+      efsVolumeConfiguration: null
+      dockerVolumeConfiguration: null
+      hosts:
+        sourcePath: "/opt/datadog-agent/run"
+    - name: "containers_root"
+      fsxWindowsFileServerVolumeConfiguration: null
+      efsVolumeConfiguration: null
+      dockerVolumeConfiguration: null
+      hosts:
+        sourcePaht: "/var/lib/docker/containers/"
+  placementConstraints: []
+  networkMode: bridge
+  requiresCompatibilities:
+    - EC2
+  containerDefinitions:
+    - name: ${task_definition_name}
+      image: dummy
+      cpu: ${cpu}
+      memory: ${memory}
+      portMappings:
+        - containerPort: ${containerPort}
+          hostPort: ${hostPort}
+          protocol: ${protocol}
+      essential: true
+      environment: []
+      mountPoints: []
+      volumesFrom: []
+      secrets: []
+      entryPoint: []
+      command: []
+      dockerLabels:
+        com.datadoghq.tags.env: ${env}
+        com.datadoghq.tags.service: ${task_definition_name}
+        com.datadoghq.tags.version: "${build_version}"
+    - name: datadog-sidecar
+      image: public.ecr.aws/datadog/agent:latest
+      cpu: 0
+      memory: 256
+      portMappings:
+        - containerPort: 8126
+          hostPort: 8126
+          protocol: tcp
+      essential: true
+      environment:
+        - name: DD_APM_ENABLED
+          value: true
+        - name: DD_APM_NON_LOCAL_TRAFFIC
+          value: true
+        - name: DD_CONTAINER_EXCLUDE
+          value: name:datadog-agent name:ecs-agent name:agent
+        - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+          value: true
+        - name: DD_LOGS_ENABLED
+          value: true
+        - name: DD_PROCESS_AGENT_ENABLED
+          value: true
+        - name: DD_SITE
+          value: datadoghq.com
+      mountPoints:
+        - sourceVolume: "cgroup"
+          readOnly: null
+          containerPath: "/host/sys/fs/cgroup"
+        - sourceVolume: "docker_sock"
+          readonly: null
+          containerPath: "/var/run/docker.sock"
+        - sourceVolume: "proc"
+          readOnly: null
+          containerPath: "/host/proc"
+        - sourceVolume: "containers_root"
+          readOnly: null
+          containerPath: "/var/lib/docker/containers"
+        - sourceVolume: "pointdir"
+          readOnly: null
+          containerPath: "/opt/datadog-agent/run"
+      volumesFrom: []
+      secrets:
+        - name: DD_API_KEY
+          valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/shared/datadog-aCpsla:api_key::'
+      entryPoint: []
+      command: []
+      dockerLabels:
+        com.datadoghq.tags.env: ${env}
+        com.datadoghq.tags.service: ${task_definition_name}
+        com.datadoghq.tags.version: "${build_version}"
