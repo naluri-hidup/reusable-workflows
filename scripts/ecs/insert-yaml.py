@@ -24,7 +24,7 @@ if 'environment' in data2[args.environment]:
 if 'secrets' in data2[args.environment]:
     data['containerDefinitions'][0]['secrets'] = data2[args.environment]['secrets']
 
-if 'portMappings' in data2[args.portMappings]:
+if 'portMappings' in data2[args.environment]:
     data['containerDefinitions'][0]['portMappings'] = data2[args.environment]['portMappings']
 
 with open(dir_path + "/" + args.output, "w", encoding = "utf-8") as yaml_file:
