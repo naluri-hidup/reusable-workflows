@@ -12,10 +12,7 @@ task-definition:
       image: dummy
       cpu: ${cpu}
       memory: ${memory}
-      portMappings:
-        - containerPort: ${containerPort}
-          hostPort: ${hostPort}
-          protocol: ${protocol}
+      portMappings: []
       essential: true
       environment: []
       mountPoints: []

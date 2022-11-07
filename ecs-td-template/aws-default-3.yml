@@ -42,10 +42,7 @@ task-definition:
       image: dummy
       cpu: ${cpu}
       memory: ${memory}
-      portMappings:
-        - containerPort: ${containerPort}
-          hostPort: ${hostPort}
-          protocol: ${protocol}
+      portMappings: []
       essential: true
       environment: []
       mountPoints: []
@@ -53,6 +50,11 @@ task-definition:
       secrets: []
       entryPoint: []
       command: []
+      links:
+        - "datadog-sidecar"
+      dependsOn:
+        - containerName: "datadog-sidecar"
+          condintion: "START"
       dockerLabels:
         com.datadoghq.tags.env: ${env}
         com.datadoghq.tags.service: ${task_definition_name}
