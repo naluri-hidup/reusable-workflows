@@ -39,6 +39,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ inputs.git_branch }}
+          fetch-depth: 0
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
