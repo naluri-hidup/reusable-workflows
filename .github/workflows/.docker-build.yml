@@ -64,6 +64,7 @@ jobs:
           if [[ ${{ inputs.builder_cache }} == false ]]; then
 
             docker buildx build \
+            --no-cache \
             --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
@@ -73,7 +74,6 @@ jobs:
           else 
 
             docker buildx build \
-            --target builder \
             --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }} \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
