@@ -17,7 +17,7 @@ task-definition:
         sourcePath: "/opt/datadog-agent/run"
     - name: "containers_root"
       host:
-        sourcePaht: "/var/lib/docker/containers/"
+        sourcePath: "/var/lib/docker/containers/"
   placementConstraints: []
   networkMode: bridge
   requiresCompatibilities:
