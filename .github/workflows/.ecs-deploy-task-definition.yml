@@ -9,6 +9,8 @@ on:
         required: true
       GH_ACTIONS_REGION:
         required: true
+      SLACK_DEPLOYMENT_WEBHOOK:
+        required: true
     inputs:
       deploy_env:
         required: true
@@ -124,3 +126,8 @@ jobs:
           ## Update service
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
           aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
+      
+      - name: Slack Notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch to ${{ inputs.deploy_env }} environment deployed by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}

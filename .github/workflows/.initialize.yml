@@ -9,7 +9,9 @@ on:
       deploy_env:
         required: false
         type: string
-        default: 'staging'
+      default_deploy_env:
+        required: true
+        type: string
     outputs:
       git_branch:
         value: ${{ jobs.initialize.outputs.git_branch }}
@@ -42,7 +44,12 @@ jobs:
         id: set_deploy_env
         run: |
           DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
-          echo "value=${DEPLOY_ENV:-"staging"}" >> $GITHUB_OUTPUT 
+          DEFAULT_DEPLOY_ENV=${{ github.event.inputs.default_deploy_env }}
+          if [[ -z $DEPLOY_ENV ]]; then 
+            echo "value=$(echo $DEFAULT_DEPLOY_ENV)" >> $GITHUB_OUTPUT
+          else
+            echo "value=$(echo $DEPLOY_ENV)" >> $GITHUB_OUTPUT 
+          fi
 
       - name: Slack Notification
         run: |
