@@ -39,7 +39,7 @@ task-definition:
         - "datadog-sidecar"
       dependsOn:
         - containerName: "datadog-sidecar"
-          condintion: "START"
+          condition: "START"
       dockerLabels:
         com.datadoghq.tags.env: ${env}
         com.datadoghq.tags.service: ${task_definition_name}
