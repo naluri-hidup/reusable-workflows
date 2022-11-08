@@ -6,9 +6,6 @@ on:
       SLACK_DEPLOYMENT_WEBHOOK:
         required: true
     inputs:
-      deploy_env:
-        required: false
-        type: string
       default_deploy_env:
         required: true
         type: string
@@ -44,7 +41,7 @@ jobs:
         id: set_deploy_env
         run: |
           DEPLOY_ENV=${{ github.event.inputs.deploy_env }}
-          DEFAULT_DEPLOY_ENV=${{ github.event.inputs.default_deploy_env }}
+          DEFAULT_DEPLOY_ENV=${{ inputs.default_deploy_env }}
           if [[ -z $DEPLOY_ENV ]]; then 
             echo "value=$(echo $DEFAULT_DEPLOY_ENV)" >> $GITHUB_OUTPUT
           else
