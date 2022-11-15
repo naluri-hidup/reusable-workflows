@@ -41,6 +41,9 @@ jobs:
           ref: ${{ inputs.git_branch }}
           fetch-depth: 0
 
+      - name: Git Pull 
+        run: git pull origin ${{ inputs.git_branch }}
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

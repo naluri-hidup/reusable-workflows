@@ -46,6 +46,11 @@ jobs:
           fetch-depth: 0
           ref: ${{ inputs.reusable_tag }}
 
+      - name: Git Pull
+        run: |
+          cd main && git pull origin ${{ inputs.git_branch }} && cd ..
+          cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
+          
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
