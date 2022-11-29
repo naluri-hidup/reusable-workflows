@@ -1,0 +1,23 @@
+name: Deploy prod
+
+on:
+  workflow_dispatch:
+
+## Approval actions
+jobs:
+  initialize:
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.initialize.yml@v1.2
+    secrets: inherit
+    with:
+      default_deploy_env: "prod"
+
+  ecs-deploy:
+    needs: [initialize ]
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.ecs-deploy-task-definition.yml@v1.2
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.initialize.outputs.deploy_env }}
+      git_sha_short: ${{ needs.initialize.outputs.git_sha_short }}
+      ecr_name: "identity-provider"
+      git_branch: ${{ needs.initialize.outputs.git_branch }}
+      reusable_tag: "v1.2"

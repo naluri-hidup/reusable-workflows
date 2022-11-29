@@ -1,0 +1,62 @@
+stag:
+  ecs:
+    task_definition_name: stag-coach-recommendation-api
+    service_name: stag-coach-recommendation-api
+    cluster_name: stag-common-cluster
+    execution_role_name: arn:aws:iam::502605353565:role/stag-coach-recommendationTaskExecutionRole
+    cpu: 0
+    memory: 256
+    task_definition_template: aws-default-1
+  portMappings:
+    - hostPort: 0
+      protocol: tcp
+      containerPort: 3000
+  environment:
+    - name: DB_NAME
+      value: naluri_internal
+  secrets:
+    - name: DB_HOST
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:stag/coach-recommendation/rds/stag-naluri-internal-h2pr00:host::'
+    - name: DB_PORT
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:stag/coach-recommendation/rds/stag-naluri-internal-h2pr00:port::'
+    - name: DB_USERNAME
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:stag/coach-recommendation/rds/stag-naluri-internal-h2pr00:username::'
+    - name: DB_PASSWORD
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:stag/coach-recommendation/rds/stag-naluri-internal-h2pr00:password::'
+
+prod:
+  ecs:
+    task_definition_name: prod-coach-recommendation-api-service
+    service_name: prod-coach-recommendation-api-service
+    cluster_name: prod-naluri-api-cluster
+    execution_role_name: arn:aws:iam::502605353565:role/prod-coach-recommendationTaskExecutionRole
+    cpu: 0
+    memory: 256
+    task_definition_template: aws-default-1
+  portMappings:
+    - hostPort: 0
+      protocol: tcp
+      containerPort: 3000
+  environment:
+    - name: DD_AGENT_HOST
+      value: datadog-prod-api.internal.naluri.net
+    - name: DD_ENV
+      value: production
+    - name: DD_LOGS_INJECTION
+      value: "true"
+    - name: DD_SERVICE
+      value: coach-recommendation-api
+    - name: DD_VERSION
+      value: "1.0"
+    - name: DB_NAME
+      value: naluri_internal
+  secrets:
+    - name: DB_HOST
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/coach-recommendation/rds/prod-naluri-internal-bNTAUU:host::'
+    - name: DB_PORT
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/coach-recommendation/rds/prod-naluri-internal-bNTAUU:port::'
+    - name: DB_USERNAME
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/coach-recommendation/rds/prod-naluri-internal-bNTAUU:username::'
+    - name: DB_PASSWORD
+      valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/coach-recommendation/rds/prod-naluri-internal-bNTAUU:password::'
+

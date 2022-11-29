@@ -1,0 +1,132 @@
+stag:
+  ecs:
+    task_definition_name: stag-identity-provider-service
+    service_name: stag-identity-provider-service
+    cluster_name: stag-common-cluster
+    container_name: stag-identity-provider
+    execution_role_name: arn:aws:iam::502605353565:role/stag-identity-provider-TaskExecutionRole
+    cpu: 128
+    memory: 256
+    task_definition_template: aws-default-1
+  portMappings:
+    - hostPort: 0
+      protocol: tcp
+      containerPort: 3000
+  environment:
+    - name: DD_AGENT_HOST
+      value: datadog-sidecar
+    - name: DD_ENV
+      value: stag
+    - name: DD_LOGS_INJECTION
+      value: "true"
+    - name: DD_SERVICE
+      value: stag-identity-provider-service
+    - name: DD_VERSION
+      value: "1.0"
+    - name: BASE_URL
+      value: https://identity-provider.staging.naluri.net
+    - name: COGNITO_USER_POOL_ID
+      value: ap-southeast-1_1gOyZTSRx
+    - name: DB_HOST
+      value: db-main.staging.naluri.net
+    - name: DB_NAME
+      value: naluri
+    - name: DB_PORT
+      value: '5432'
+    - name: DB_USERNAME
+      value: naluri
+    - name: MEMBER_COGNITO_AUTHORITY_URL
+      value: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_4Fi8bMdNY
+    - name: MEMBER_COGNITO_CLIENT_ID
+      value: 7tek3shbejh28rhr5ijrmeo960
+    - name: MEMBER_COGNITO_DOMAIN
+      value: https://naluri-identity-staging.auth.ap-southeast-1.amazoncognito.com
+    - name: MEMBER_COGNITO_USER_POOL_ID
+      value: ap-southeast-1_4Fi8bMdNY
+    - name: NALURI_API_URL
+      value: https://staging.naluri.net/api
+    - name: NODE_ENV
+      value: staging
+    - name: PARTNER_TUNEPROTECT_API
+      value: http://webtest.tuneprotect.co.th/tunepolicy/api/WEBSITE/CheckePolicyDiabetes
+    - name: PARTNER_TUNEPROTECT_USERNAME
+      value: TESTAPI
+    - name: PORT
+      value: '3000'
+  secrets:
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/stag.naluri.jwt.secret
+      name: JWT_TOKEN_SECRET
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/stag.naluri.db.password
+      name: DB_PASSWORD
+    - valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:stag/naluri/core-XaHxXZ:INTERNAL_API_KEY::'
+      name: NALURI_API_KEY
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/stag.tuneprotect.api.password
+      name: PARTNER_TUNEPROTECT_PASSWORD
+prod:
+  ecs:
+    task_definition_name: prod-identity-provider-service
+    service_name: prod-identity-provider-service
+    cluster_name: prod-naluri-foundation-cluster
+    container_name: prod-identity-provider
+    execution_role_name: arn:aws:iam::502605353565:role/prod-identity-provider-TaskExecutionRole
+    cpu: 128
+    memory: 256
+    task_definition_template: aws-default-2
+  portMappings:
+    - hostPort: 0
+      protocol: tcp
+      containerPort: 3000
+  environment:
+    - name: DD_AGENT_HOST
+      value: datadog-prod-foundation.internal.naluri.net
+    - name: DD_ENV
+      value: production
+    - name: DD_LOGS_INJECTION
+      value: "true"
+    - name: DD_SERVICE
+      value: prod-identity-provider-service
+    - name: DD_VERSION
+      value: "1.0"
+    - name: APPSIGNAL_APP_ENV
+      value: prod
+    - name: APPSIGNAL_PUSH_API_KEY
+      value: 6ff577ad-92b4-4b6b-a5ce-44638a7b77df
+    - name: BASE_URL
+      value: https://idp.naluri.net
+    - name: COGNITO_USER_POOL_ID
+      value: ap-southeast-1_Vpha9ODbk
+    - name: DB_HOST
+      value: db-main.naluri.net
+    - name: DB_PORT
+      value: '5432'
+    - name: DB_USERNAME
+      value: naluri
+    - name: DB_NAME
+      value: naluri
+    - name: MEMBER_COGNITO_AUTHORITY_URL
+      value: https://cognito-idp.ap-southeast-1.amazonaws.com/ap-southeast-1_foCmLVYzJ
+    - name: MEMBER_COGNITO_CLIENT_ID
+      value: 37tfp9139dkndt71gstri2kt9t
+    - name: MEMBER_COGNITO_DOMAIN
+      value: https://naluri-identity.auth.ap-southeast-1.amazoncognito.com
+    - name: MEMBER_COGNITO_USER_POOL_ID
+      value: ap-southeast-1_foCmLVYzJ
+    - name: NALURI_API_URL
+      value: https://naluri.net/api
+    - name: NODE_ENV
+      value: production
+    - name: PARTNER_TUNEPROTECT_API
+      value: http://www.tuneinsurance.co.th:8002/api/WEBSITE/CheckePolicyDiabetes
+    - name: PARTNER_TUNEPROTECT_USERNAME
+      value: Naruli
+    - name: PORT
+      value: '3000'
+  secrets:
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/prod.naluri.jwt.secret
+      name: JWT_TOKEN_SECRET
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/prod.tuneprotect.api.password
+      name: PARTNER_TUNEPROTECT_PASSWORD
+    - valueFrom: arn:aws:ssm:ap-southeast-1:502605353565:parameter/prod.naluri.db.password
+      name: DB_PASSWORD
+    - valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/naluri/core-qQnLKD:INTERNAL_API_KEY::'
+      name: NALURI_API_KEY
