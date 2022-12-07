@@ -3,11 +3,11 @@ name: Workflow for terraform
 on:
   workflow_call:
     secrets:
-      GH_ACTIONS_ACCESS_KEY_ID:
+      TERRAFORM_ACCESS_KEY_ID:
         required: true
-      GH_ACTIONS_SECRET_ACCESS_KEY:
+      TERRAFORM_SECRET_ACCESS_KEY:
         required: true
-      GH_ACTIONS_REGION:
+      TERRAFORM_REGION:
         required: true
       SLACK_DEPLOYMENT_WEBHOOK:
         required: true
