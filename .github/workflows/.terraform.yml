@@ -46,10 +46,10 @@ jobs:
         uses: hashicorp/setup-terraform@v1
       
       - name: Terraform Init
-        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
+        run: cd ${{ inputs_module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
 
       - name: Terraform Plan
-        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
+        run: cd ${{ inputs_module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
 
       - name: Terrraform Apply
-        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
+        run: cd ${{ inputs_module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
