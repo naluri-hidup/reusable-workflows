@@ -22,7 +22,7 @@ on:
         required: true
         type: string
       apply:
-        required: true
+        required: false
         type: boolean
         default: false
 
