@@ -1,0 +1,55 @@
+name: Workflow for terraform
+
+on:
+  workflow_call:
+    secrets:
+      GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
+      GH_ACTIONS_REGION:
+        required: true
+      SLACK_DEPLOYMENT_WEBHOOK:
+        required: true
+    inputs:
+      module_name:
+        required: true
+        type: string
+      config_name:
+        required: true
+        type: string
+      git_branch:
+        required: true
+        type: string
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.git_branch }}
+          fetch-depth: 0
+
+      - name: Git Pull
+        run : git pull origin ${{ inputs.git_branch }}
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.GH_ACTIONS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.GH_ACTIONS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Terraform Init
+        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
+
+      - name: Terraform Plan
+        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
+
+      - name: Terrraform Apply
+        run: cd module_name && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
