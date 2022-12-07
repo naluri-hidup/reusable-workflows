@@ -21,6 +21,10 @@ on:
       git_branch:
         required: true
         type: string
+      apply:
+        required: true
+        type: boolean
+        default: false
 
 jobs:
   terraform:
@@ -52,4 +56,5 @@ jobs:
         run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
 
       - name: Terrraform Apply
+        if: ${{ inputs.apply }}
         run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
