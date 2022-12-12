@@ -3,10 +3,14 @@ name: Workflow update ECS task definition
 on:
   workflow_call:
     secrets:
-      GH_ACTIONS_ACCESS_KEY_ID:
+      STAG_GH_ACTIONS_ACCESS_KEY_ID:
         required: true
-      GH_ACTIONS_SECRET_ACCESS_KEY:
+      STAG_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: true
+      PROD_GH_ACTIONS_ACCESS_KEY_ID:
+        required: false
+      PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: false
       GH_ACTIONS_REGION:
         required: true
       SLACK_DEPLOYMENT_WEBHOOK:
@@ -27,6 +31,14 @@ on:
       reusable_tag:
         required: true
         type: string
+      aws_account:
+        required: false
+        type: string
+        default: 'stag'
+      aws_region:
+        required: false
+        type: string
+        default: 'ap-southeast-1'
 jobs:
   ecs-update:
     runs-on: ubuntu-latest
@@ -51,13 +63,22 @@ jobs:
           cd main && git pull origin ${{ inputs.git_branch }} && cd ..
           cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
           
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials Staging
+        if: contains(${{ inputs.aws_account }}, 'stag')
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.GH_ACTIONS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.GH_ACTIONS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.GH_ACTIONS_REGION }}
+          aws-access-key-id: ${{ secrets.STAG_GH_ACTIONS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.STAG_GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
       
+      - name: Configure AWS Credentials Production
+        if: contains(${{ inputs.aws_account }}, 'prod')
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_GH_ACTIONS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
