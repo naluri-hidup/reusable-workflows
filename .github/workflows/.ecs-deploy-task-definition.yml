@@ -11,8 +11,6 @@ on:
         required: false
       PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: false
-      GH_ACTIONS_REGION:
-        required: true
       SLACK_DEPLOYMENT_WEBHOOK:
         required: true
     inputs:
@@ -39,6 +37,7 @@ on:
         required: false
         type: string
         default: 'ap-southeast-1'
+        
 jobs:
   ecs-update:
     runs-on: ubuntu-latest
