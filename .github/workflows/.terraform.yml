@@ -47,7 +47,7 @@ jobs:
           aws-region: ${{ secrets.TERRAFORM_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
       
       - name: Terraform Init
         run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
