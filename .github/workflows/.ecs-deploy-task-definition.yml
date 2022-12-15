@@ -63,7 +63,7 @@ jobs:
           cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
           
       - name: Configure AWS Credentials Staging
-        if: contains(${{ inputs.aws_account }}, 'stag')
+        if: ${{ inputs.aws_account == 'stag' }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.STAG_GH_ACTIONS_ACCESS_KEY_ID }}
@@ -71,7 +71,7 @@ jobs:
           aws-region: ${{ inputs.aws_region }}
       
       - name: Configure AWS Credentials Production
-        if: contains(${{ inputs.aws_account }}, 'prod')
+        if: ${{ inputs.aws_account == 'prod' }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.PROD_GH_ACTIONS_ACCESS_KEY_ID }}
