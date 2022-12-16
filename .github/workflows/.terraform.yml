@@ -62,22 +62,22 @@ jobs:
             echo "$file was changed" 
             files+=($file)
           done
-          echo "::set-output name=terraform_changed_files::$files"
+          echo "::set-output name=terraform_changed_files::toJSON($files)"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
       
       - name: Test
         run: |
-          echo ${{ steps.terraform-config-files.terraform_changed_files }}
-          for i in ${{ steps.terraform-config-files.terraform_changed_files }}
-          do
-            echo $i
-            for x in $(echo $i | tr "/config/")
-            do
-              echo $x
-            done
-          done
+          echo ${{ fromJSON(steps.terraform-config-files.terraform_changed_files) }}
+          # for i in ${{ fromJSON(steps.terraform-config-files.terraform_changed_files) }}
+          # do
+          #   echo $i
+          #   for x in $(echo $i | tr "/config/")
+          #   do
+          #     echo $x
+          #   done
+          # done
       
       - name: Terraform Init
         run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
