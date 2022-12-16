@@ -62,7 +62,8 @@ jobs:
             echo "$file was changed" 
             files+=($file)
           done
-          echo "::set-output name=terraform_changed_files::toJSON($files)"
+          jsonvalue=${{ toJSON($files) }}
+          echo "::set-output name=terraform_changed_files::$jsonvalue"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
