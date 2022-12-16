@@ -71,7 +71,8 @@ jobs:
         run: |
           for i in ${{ steps.terraform-config-files.terraform_changed_files }}
           do
-            for x in $(echo $i | tr "/config")
+            echo $i
+            for x in $(echo $i | tr "/config/")
             do
               echo $x
             done
