@@ -54,33 +54,33 @@ jobs:
             **/config/**
             **/**/config/**
 
-      - name: List all changed files
-        id: terraform-config-files
-        run: |
-          files=()
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-            echo "$file was changed" 
-            files+=($file)
-          done
+      # - name: List all changed files
+      #   id: terraform-config-files
+      #   run: |
+      #     files=()
+      #     for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+      #       echo "$file was changed" 
+      #       files+=($file)
+      #     done
 
-          ## convert to json
-          # echo "::set-output name=terraform_changed_files::"
+      #     ## convert to json
+      #     # echo "::set-output name=terraform_changed_files::"
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
       
-      - name: Test
-        run: |
-          ## convert back to array
+      # - name: Test
+      #   run: |
+      #     ## convert back to array
           
-          # for i in ${{ fromJSON(steps.terraform-config-files.terraform_changed_files) }}
-          # do
-          #   echo $i
-          #   for x in $(echo $i | tr "/config/")
-          #   do
-          #     echo $x
-          #   done
-          # done
+      #     # for i in ${{ fromJSON(steps.terraform-config-files.terraform_changed_files) }}
+      #     # do
+      #     #   echo $i
+      #     #   for x in $(echo $i | tr "/config/")
+      #     #   do
+      #     #     echo $x
+      #     #   done
+      #     # done
       
       - name: Terraform Init
         run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
