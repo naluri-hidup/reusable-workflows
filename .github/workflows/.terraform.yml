@@ -62,6 +62,7 @@ jobs:
             echo "$file was changed" 
             files+=($file)
           done
+          echo $files[0]
           echo "::set-output name=terraform_changed_files::$files"
 
       - name: Setup Terraform
