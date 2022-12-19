@@ -61,7 +61,7 @@ jobs:
           else
             echo "value=$(echo STANDALONE_TASK)" >> $GITHUB_OUTPUT
           fi
-
+          
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
