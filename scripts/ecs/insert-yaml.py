@@ -30,6 +30,9 @@ if 'portMappings' in data2[args.environment]:
 if 'linuxParameters' in data2[args.environment]:
     data['containerDefinitions'][0]['linuxParameters'] = data2[args.environment]['linuxParameters']
 
+if 'command' in data2[args.environment]:
+    data['containerDefinitions'][0]['command'] = data2[args.environment]['command']
+
 with open(dir_path + "/" + args.output, "w", encoding = "utf-8") as yaml_file:
     dump = ruamel.yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper)
     yaml_file.write(dump)
