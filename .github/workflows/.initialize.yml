@@ -55,13 +55,19 @@ jobs:
         id: set_standalone_task
         run: |
           STANDALONE_TASK=${{ github.event.inputs.standalone_task }}
+          echo $STANDALONE_TASK
           DEFAULT_STANDALONE_TASK=false
           if [[ -z $STANDALONE_TASK ]]; then
             echo "value=$(echo DEFAULT_STANDALONE_TASK)" >> $GITHUB_OUTPUT
           else
             echo "value=$(echo STANDALONE_TASK)" >> $GITHUB_OUTPUT
           fi
+          echo $STANDALONE_TASK
           
+      - name: Echo
+        run: |
+          echo ${{ steps.set_standalone_task.outputs.value }}
+
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
