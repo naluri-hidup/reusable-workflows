@@ -25,7 +25,7 @@ jobs:
       git_branch: ${{ steps.set_git_var.outputs.git_branch }}
       git_sha_short: ${{ steps.set_git_var.outputs.git_sha_short }}
       deploy_env: ${{ steps.set_deploy_env.outputs.value }}
-      standalone_task: ${{ steps.set_standalone_task.value }}
+      standalone_task: ${{ steps.set_standalone_task.outputs.value }}
     steps:
       - name: Set git branch
         id: set_git_var
