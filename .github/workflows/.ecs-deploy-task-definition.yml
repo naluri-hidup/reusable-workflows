@@ -37,6 +37,10 @@ on:
         required: false
         type: string
         default: 'ap-southeast-1'
+      standalone_ecs_task:
+        required: false
+        type: boolean
+        default: false
         
 jobs:
   ecs-update:
@@ -154,8 +158,13 @@ jobs:
 
           ## Update service
           TASK_REVISION=`aws ecs describe-task-definition --task-definition ${{ steps.generate.outputs.task_definition_name }} | egrep "revision" | tr "/" " " | awk '{print $2}' | sed 's/,//'`
-          aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
-      
+
+          if [[ ${{ inputs.standalone_ecs_task }} == false ]]; then
+            aws ecs update-service --cluster ${{ steps.generate.outputs.cluster_name }} --service ${{ steps.generate.outputs.service_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
+          else
+            aws ecs run-task --cluster ${{ steps.generate.outputs.cluster_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
+          fi
+          
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
