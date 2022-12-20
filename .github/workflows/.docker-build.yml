@@ -105,7 +105,7 @@ jobs:
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --build-arg FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT=${FIREBASE_SERVICE_ACCOUNT} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:$latest .
           else 
@@ -117,7 +117,7 @@ jobs:
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --build-arg FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT=${FIREBASE_SERVICE_ACCOUNT} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest . 
           fi
