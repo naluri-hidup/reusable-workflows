@@ -62,20 +62,14 @@ jobs:
       - name: Git Pull 
         run: git pull origin ${{ inputs.git_branch }}
 
-      - name: Configure AWS Credentials Staging
-        if: ${{ inputs.aws_account == 'stag' }}
+      - name: Configure AWS Credentials
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}GH_ACTIONS_SECRET_ACCESS_KEY
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.STAG_GH_ACTIONS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.STAG_GH_ACTIONS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ inputs.aws_region }}
-      
-      - name: Configure AWS Credentials Production
-        if: ${{ inputs.aws_account == 'prod' }}
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.PROD_GH_ACTIONS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.PROD_GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
           aws-region: ${{ inputs.aws_region }}
           
       - name: Login to Amazon ECR
@@ -92,34 +86,30 @@ jobs:
           DOCKER_BUILDKIT: 1
           FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
-          echo $FIREBASE_SERVICE_ACCOUNT
+          if [[ ${{ inputs.builder_cache }} == false ]]; then
 
-          echo ${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}
+            docker buildx build \
+            --no-cache \
+            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
+            --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
+            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
+            --build-arg APP_ENV=${{ inputs.deploy_env }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
 
-          # if [[ ${{ inputs.builder_cache }} == false ]]; then
+          else 
 
-          #   docker buildx build \
-          #   --no-cache \
-          #   --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
-          #   --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-          #   --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
-          #   --build-arg APP_ENV=${{ inputs.deploy_env }} \
-          #   --build-arg FIREBASE_SERVICE_ACCOUNT='$FIREBASE_SERVICE_ACCOUNT' \
-          #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+            docker buildx build \
+            --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }} \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
+            --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
+            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
+            --build-arg APP_ENV=${{ inputs.deploy_env }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+          fi
 
-          # else 
-
-          #   docker buildx build \
-          #   --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }} \
-          #   --build-arg BUILDKIT_INLINE_CACHE=1 \
-          #   --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
-          #   --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-          #   --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
-          #   --build-arg APP_ENV=${{ inputs.deploy_env }} \
-          #   --build-arg FIREBASE_SERVICE_ACCOUNT='$FIREBASE_SERVICE_ACCOUNT' \
-          #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-          # fi
-
-          # docker tag $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
-          # docker push $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
+          docker tag $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
+          docker push $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
           

@@ -66,20 +66,14 @@ jobs:
           cd main && git pull origin ${{ inputs.git_branch }} && cd ..
           cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
           
-      - name: Configure AWS Credentials Staging
-        if: ${{ inputs.aws_account == 'stag' }}
+      - name: Configure AWS Credentials
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}GH_ACTIONS_SECRET_ACCESS_KEY
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.STAG_GH_ACTIONS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.STAG_GH_ACTIONS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ inputs.aws_region }}
-      
-      - name: Configure AWS Credentials Production
-        if: ${{ inputs.aws_account == 'prod' }}
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.PROD_GH_ACTIONS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.PROD_GH_ACTIONS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
           aws-region: ${{ inputs.aws_region }}
 
       - name: Login to Amazon ECR
