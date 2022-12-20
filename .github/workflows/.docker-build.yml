@@ -90,14 +90,11 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DOCKER_BUILDKIT: 1
-          FIREBASE_SERVICE_ACCOUNT_STAG: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAG }}
-          FIREBASE_SERVICE_ACCOUNT_PROD: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
+          FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
-          FIREBASE_SERVICE_ACCOUNT=$FIREBASE_SERVICE_ACCOUNT_STAG
-          if [[ '${{ inputs.firebase_env }}' == 'prod' ]]; then
-            FIREBASE_SERVICE_ACCOUNT=$FIREBASE_SERVICE_ACCOUNT_PROD
-          fi
-          echo '$FIREBASE_SERVICE_ACCOUNT'
+          echo $FIREBASE_SERVICE_ACCOUNT
+
+          echo ${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}
 
           # if [[ ${{ inputs.builder_cache }} == false ]]; then
 
