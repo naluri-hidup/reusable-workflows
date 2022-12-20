@@ -13,6 +13,10 @@ on:
         required: false
       FOUNDATION_ACCESS_TOKEN:
         required: true
+      FIREBASE_SERVICE_ACCOUNT_STAG:
+        required: false
+      FIREBASE_SERVICE_ACCOUNT_PROD:
+        required: false
     inputs: 
       builder_cache:
         required: false
@@ -38,6 +42,10 @@ on:
         required: false
         type: string
         default: 'ap-southeast-1'
+      firebase_env:
+        required: false
+        type: string
+        default: 'stag'
 
 jobs:
   docker_build: 
@@ -83,6 +91,12 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DOCKER_BUILDKIT: 1
         run: |
+          if [[ ${{ inputs.firebase_env }} == 'stag' ]]; then
+            FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAG }}
+          else
+            FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
+          fi
+
           if [[ ${{ inputs.builder_cache }} == false ]]; then
 
             docker buildx build \
@@ -91,6 +105,7 @@ jobs:
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:$latest .
           else 
@@ -102,6 +117,7 @@ jobs:
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
+            --build-arg FIREBASE_SERVICE_ACCOUNT=${{ secrets.FIREBASE_SERVICE_ACCOUNT }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest . 
           fi
