@@ -13,9 +13,9 @@ on:
         required: false
       FOUNDATION_ACCESS_TOKEN:
         required: true
-      STAG_FIREBASE_SERVICE_ACCOUNT:
+      FIREBASE_SERVICE_ACCOUNT_STAG:
         required: false
-      PROD_FIREBASE_SERVICE_ACCOUNT:
+      FIREBASE_SERVICE_ACCOUNT_PROD:
         required: false
       MASTER_GH_ACTIONS_ACCESS_KEY_ID:
         required: false
@@ -88,7 +88,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           DOCKER_BUILDKIT: 1
-          FIREBASE_SERVICE_ACCOUNT: ${{ inputs.firebase_env }}_FIREBASE_SERVICE_ACCOUNT
+          FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
           if [[ ${{ inputs.builder_cache }} == false ]]; then
 
