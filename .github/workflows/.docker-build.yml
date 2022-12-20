@@ -95,7 +95,8 @@ jobs:
           if [[ '${{ inputs.firebase_env }}' == 'prod' ]]; then
             FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}'
           fi
-          echo '$FIREBASE_SERVICE_ACCOUNT'
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_STAG }}'
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}'
 
           # if [[ ${{ inputs.builder_cache }} == false ]]; then
 
