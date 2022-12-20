@@ -99,7 +99,7 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest .
 
           else 
 
@@ -111,9 +111,7 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest .
           fi
 
-          docker tag $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
-          docker push $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
           
