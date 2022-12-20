@@ -91,7 +91,8 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
           echo ${{ secrets['FIREBASE_SERVICE_ACCOUNT_PROD'] }}
-
+          echo ${{ secrets['FIREBASE_SERVICE_ACCOUNT_STAG'] }}
+          
           # if [[ ${{ inputs.builder_cache }} == false ]]; then
 
           #   docker buildx build \
