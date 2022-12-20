@@ -103,6 +103,6 @@ jobs:
             --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-
+            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest . 
           fi
           
