@@ -17,6 +17,10 @@ on:
         required: false
       FIREBASE_SERVICE_ACCOUNT_PROD:
         required: false
+      MASTER_GH_ACTIONS_ACCESS_KEY_ID:
+        required: false
+      MASTER_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: false
     inputs: 
       builder_cache:
         required: false
@@ -86,30 +90,32 @@ jobs:
           DOCKER_BUILDKIT: 1
           FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
-          if [[ ${{ inputs.builder_cache }} == false ]]; then
+          echo ${{ secrets['FIREBASE_SERVICE_ACCOUNT_PROD'] }}
 
-            docker buildx build \
-            --no-cache \
-            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
-            --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
-            --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+          # if [[ ${{ inputs.builder_cache }} == false ]]; then
 
-          else 
+          #   docker buildx build \
+          #   --no-cache \
+          #   --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
+          #   --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
+          #   --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
+          #   --build-arg APP_ENV=${{ inputs.deploy_env }} \
+          #   --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
+          #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
 
-            docker buildx build \
-            --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }} \
-            --build-arg BUILDKIT_INLINE_CACHE=1 \
-            --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
-            --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
-            --build-arg APP_ENV=${{ inputs.deploy_env }} \
-            --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
-            --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
-          fi
+          # else 
 
-          docker tag $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
-          docker push $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
+          #   docker buildx build \
+          #   --cache-from $ECR_REGISTRY/${{ inputs.ecr_name }} \
+          #   --build-arg BUILDKIT_INLINE_CACHE=1 \
+          #   --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
+          #   --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
+          #   --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
+          #   --build-arg APP_ENV=${{ inputs.deploy_env }} \
+          #   --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
+          #   --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} .
+          # fi
+
+          # docker tag $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }} $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
+          # docker push $ECR_REGISTRY/${{ inputs.ecr_name }}:latest
           

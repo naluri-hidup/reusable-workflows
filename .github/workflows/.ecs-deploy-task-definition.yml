@@ -13,6 +13,8 @@ on:
         required: false
       SLACK_DEPLOYMENT_WEBHOOK:
         required: true
+      DEFAULT_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
     inputs:
       deploy_env:
         required: true
