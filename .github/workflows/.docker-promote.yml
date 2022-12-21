@@ -1,0 +1,87 @@
+name: Workflow for move ecr image from one aws to another aws
+
+on:
+  workflow_call:
+    secrets:
+      STAG_GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      STAG_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
+      PROD_GH_ACTIONS_ACCESS_KEY_ID:
+        required: false
+      PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: false
+  inputs:
+    git_sha_short:
+      required: true
+      type: string
+    source_aws_account:
+      required: false
+      type: string
+      default: 'stag'
+    source_aws_region:
+      required: false
+      type: string
+      default: 'ap-southeast-1'
+    source_ecr_name:
+        required: true
+        type: string
+    target_aws_account:
+      required: false
+      type: string
+      default: 'prod'
+    target_aws_region:
+      required: false
+      type: string
+      default: 'ap-southeast-1'
+    target_ecr_name:
+        required: true
+        type: string
+    
+jobs:
+  docker-promte:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS Credentials - Source ECR
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.source_aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.source_aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
+          aws-region: ${{ inputs.source_aws_region }}
+
+      - name: Login to Amazon Source ECR
+        id: login-source-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Pull Image from Source ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
+        run: |
+          docker pull $ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short }}
+
+      - name: Configure AWS Credentials - Target ECR
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.target_aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.target_aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
+          aws-region: ${{ inputs.target_aws_region }}
+
+      - name: Login to Amazon Target ECR
+        id: login-target-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      
+      - name: Push Image to Target ECR
+        env:
+          SOURCE_ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
+          TARGET_ECR_REGISTRY: ${{ steps.login-target-ecr.outputs.registry }}
+        run: |
+          docker tag $SOURCE_ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short }} $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short }}
+          docker push $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short }}
+        
+
