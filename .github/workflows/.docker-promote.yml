@@ -11,32 +11,32 @@ on:
         required: false
       PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: false
-  inputs:
-    git_sha_short:
-      required: true
-      type: string
-    source_aws_account:
-      required: false
-      type: string
-      default: 'stag'
-    source_aws_region:
-      required: false
-      type: string
-      default: 'ap-southeast-1'
-    source_ecr_name:
+    inputs:
+      git_sha_short:
         required: true
         type: string
-    target_aws_account:
-      required: false
-      type: string
-      default: 'prod'
-    target_aws_region:
-      required: false
-      type: string
-      default: 'ap-southeast-1'
-    target_ecr_name:
-        required: true
+      source_aws_account:
+        required: false
         type: string
+        default: 'stag'
+      source_aws_region:
+        required: false
+        type: string
+        default: 'ap-southeast-1'
+      source_ecr_name:
+          required: true
+          type: string
+      target_aws_account:
+        required: false
+        type: string
+        default: 'prod'
+      target_aws_region:
+        required: false
+        type: string
+        default: 'ap-southeast-1'
+      target_ecr_name:
+          required: true
+          type: string
     
 jobs:
   docker-promte:
