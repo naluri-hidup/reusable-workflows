@@ -46,12 +46,13 @@ jobs:
       - name: Get Module & Config
         run : |
           config_path=${{ inputs.config_path }}
-          arr=(`echo $config_path | tr '/config/' ' '`)
-          echo $arr[0] # module
+          arr=(`echo $config_path | tr '/config/' ''`)
+          echo ${arr[0]} # module
 
-          arr1=(`echo $arr[1] | tr '/' '.tfvars'`)
-          lastIndex=${#arr1[@]} - 1
-          echo $arr1[$lastIndex] # config
+          arr1=(`echo ${arr[1]} | tr '/' '.tfvars'`)
+          length=${#arr1[@]}
+          lastIndex=$(expr $length - 1)
+          echo ${arr1[$lastIndex]} # config
 
       # - name: Setup Terraform
       #   uses: hashicorp/setup-terraform@v2
