@@ -12,10 +12,7 @@ on:
       SLACK_DEPLOYMENT_WEBHOOK:
         required: true
     inputs:
-      module_name:
-        required: true
-        type: string
-      config_name:
+      config_path:
         required: true
         type: string
       git_branch:
@@ -45,49 +42,27 @@ jobs:
           aws-access-key-id: ${{ secrets.TERRAFORM_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TERRAFORM_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.TERRAFORM_REGION }}
-
-      - name: Identify files changes
-        id: changed-files
-        uses: tj-actions/changed-files@v34
-        with:
-          files: |
-            **/config/**
-            **/**/config/**
-
-      # - name: List all changed files
-      #   id: terraform-config-files
-      #   run: |
-      #     files=()
-      #     for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
-      #       echo "$file was changed" 
-      #       files+=($file)
-      #     done
-
-      #     ## convert to json
-      #     # echo "::set-output name=terraform_changed_files::"
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
       
-      # - name: Test
-      #   run: |
-      #     ## convert back to array
-          
-      #     # for i in ${{ fromJSON(steps.terraform-config-files.terraform_changed_files) }}
-      #     # do
-      #     #   echo $i
-      #     #   for x in $(echo $i | tr "/config/")
-      #     #   do
-      #     #     echo $x
-      #     #   done
-      #     # done
+      - name: Get Module & Config
+        run : |
+          config_path=${{ inputs.config_path }}
+          IFS="/config/" read -a arr <<< $config_path
+          echo $arr[0] # module
+
+          IFS="/" read -a arr1 <<< $arr[1]
+          IFS=".tfvars" read -a arr1 <<< $arr1[${#arr1[@]} - 1]
+
+          echo $arr1[0] # config
+
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v2
       
-      - name: Terraform Init
-        run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
+      # - name: Terraform Init
+      #   run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.init
 
-      - name: Terraform Plan
-        run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
+      # - name: Terraform Plan
+      #   run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.plan
 
-      - name: Terrraform Apply
-        if: ${{ inputs.apply }}
-        run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
+      # - name: Terrraform Apply
+      #   if: ${{ inputs.apply }}
+      #   run: cd ${{ inputs.module_name }} && make CONFIG_NAME=${{ inputs.config_name }} terraform.apply
