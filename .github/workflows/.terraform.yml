@@ -70,10 +70,11 @@ jobs:
           module_path=$(dirname "$config_path")
 
           module_name=(`echo $module_path | tr "/" " "`)
-
+          echo $module_name
           count=1
           for v in $module_name
           do
+            echo $v
             if [[ $v == "config" ]]; then
               count=$(expr $count - 1)
               echo "yes"
