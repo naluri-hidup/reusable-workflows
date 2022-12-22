@@ -69,12 +69,12 @@ jobs:
           config_path=${{ inputs.config_path }}
           module_path=$(dirname "$config_path")
 
-          module_name=(`echo $module_path | tr "/" " "`)
+          module_path=(`echo $module_path | tr "/" " "`)
 
-          cp template/scripts/terraform/Makefile $module_name
-          ls -la $module_name
+          cp template/scripts/terraform/Makefile $module_path
+          ls -la $module_path
 
-          module_name=(`echo $module_name | tr "_" "-"`)
+          module_name=(`echo $module_path | tr "_" "-"`)
           module_name="${{ inputs.component }}-$module_name"
 
           c=$(basename "$config_path")
