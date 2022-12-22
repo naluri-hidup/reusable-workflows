@@ -68,7 +68,7 @@ jobs:
         run: |
           config_path=${{ inputs.config_path }}
           module_path=$(dirname "$config_path")
-
+          echo $module_path
           module_name=(`echo $module_path | tr "/" " "`)
           echo $module_name
           count=1
