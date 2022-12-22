@@ -68,41 +68,25 @@ jobs:
         run: |
           config_path=${{ inputs.config_path }}
           module_path=$(dirname "$config_path")
-          echo $module_path
+
           module_name=(`echo $module_path | tr "/" " "`)
-          echo $module_name
-          count=1
-          for v in $module_name
-          do
-            echo $v
-            if [[ $v == "config" ]]; then
-              count=$(expr $count - 1)
-              echo "yes"
-              break;
-            else
-              count=$(expr $count + 1)
-            fi
-          done
 
-          echo $count
-          echo ${module_name[$count]}
+          cp template/scripts/terraform/Makefile $module_name
+          ls -la $module_name
 
-          # cp template/scripts/terraform/Makefile ${module_name[$count]}
-          # ls -la ${module_name[$count]}
+          module_name=(`echo $module_name | tr "_" "-"`)
+          module_name="${{ inputs.component }}-$module_name"
 
-          # module_name=(`echo ${module_name[$count]} | tr "_" "-"`)
-          # module_name="${{ inputs.component }}-$module_name"
-
-          # c=$(basename "$config_path")
-          # config_name=(`echo $c | tr "." " "`)
+          c=$(basename "$config_path")
+          config_name=(`echo $c | tr "." " "`)
 
           # echo "module_path=$(echo $module_path)" >> $GITHUB_OUTPUT
           # echo "module_name=$(echo $module_name)" >> $GITHUB_OUTPUT
           # echo "config_name=$(echo ${config_name[1]})" >> $GITHUB_OUTPUT
 
           echo $module_path
-          # echo $module_name
-          # echo ${config_name[1]}
+          echo $module_name
+          echo $config_name
 
       # - name: Setup Terraform
       #   uses: hashicorp/setup-terraform@v2
