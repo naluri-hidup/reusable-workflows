@@ -46,7 +46,7 @@ jobs:
       - name: Get Module & Config
         run : |
           config_path=${{ inputs.config_path }}
-          arr=(`echo $config_path | tr '/config/'`)
+          arr=(`echo $config_path | tr '/config/' ' '`)
           echo $arr[0] # module
 
           arr1=(`echo $arr[1] | tr '/' '.tfvars'`)
