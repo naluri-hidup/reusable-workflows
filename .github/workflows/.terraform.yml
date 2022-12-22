@@ -88,15 +88,15 @@ jobs:
           echo $module_name
           echo $config_name
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
       
-      # - name: Terraform Init
-      #   run: cd ${{ steps.terraform-config.outputs.module_path }} && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} terraform.init
+      - name: Terraform Init
+        run: cd ${{ steps.terraform-config.outputs.module_path }} && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} terraform.init
 
-      # - name: Terraform Plan
-      #   run: cd ${{ steps.terraform-config.outputs.module_path } && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} DESTROY=${{ inputs.destroy }} terraform.plan
+      - name: Terraform Plan
+        run: cd ${{ steps.terraform-config.outputs.module_path } && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} DESTROY=${{ inputs.destroy }} terraform.plan
 
-      # - name: Terrraform Apply
-      #   if: ${{ inputs.apply }}
-      #   run: cd ${{ steps.terraform-config.outputs.module_path } && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} DESTROY=${{ inputs.destroy }} terraform.apply
+      - name: Terrraform Apply
+        if: ${{ inputs.apply }}
+        run: cd ${{ steps.terraform-config.outputs.module_path } && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} DESTROY=${{ inputs.destroy }} terraform.apply
