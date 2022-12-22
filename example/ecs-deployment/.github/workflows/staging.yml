@@ -1,0 +1,56 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Specify the environment to deploy to'
+        required: false
+        default: stag
+    ## This for db migration pipeline, if not require can remove from here until     
+      standalone_task:
+        type: boolean
+        required: true
+        default: false
+        description: "Turn on if for migration"      
+    ## here  
+
+jobs:
+  initialize:
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.initialize.yml@v1.6
+    secrets: inherit
+    with:
+      default_deploy_env: "stag"
+
+  docker_build:
+    needs: initialize
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.docker-build.yml@v1.6
+    secrets: inherit
+    with:
+      git_branch: ${{ needs.initialize.outputs.git_branch }}
+      deploy_env: ${{ needs.initialize.outputs.deploy_env }}
+      git_sha_short: ${{ needs.initialize.outputs.git_sha_short }}
+      ecr_name: "<ecr_name>"
+      aws_account: 'stag' # master, stag, prod
+      aws_region: 'ap-southeast-1'
+      builder_cache: false # true, false
+      firebase_env: 'stag' # stag, prod
+
+  ecs-deploy:
+    needs: [initialize, docker_build]
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.ecs-deploy-task-definition.yml@v1.6
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.initialize.outputs.deploy_env }}
+      git_sha_short: ${{ needs.initialize.outputs.git_sha_short }}
+      ecr_name: "<ecr_name>"
+      git_branch: ${{ needs.initialize.outputs.git_branch }}
+      reusable_tag: "v1.6"
+      standalone_ecs_task: "${{ needs.initialize.outputs.standalone_task == 'true' }}" # true or false
+      aws_account: 'stag' # master, stag, prod
+      aws_region: 'ap-southeast-1'

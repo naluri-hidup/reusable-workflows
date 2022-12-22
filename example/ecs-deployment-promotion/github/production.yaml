@@ -1,0 +1,46 @@
+name: Production Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_env:
+        description: 'Specify the environment to deploy to'
+        required: false
+        default: prod
+      ## This for db migration pipeline, if not require can remove from here until     
+      standalone_task:
+        type: boolean
+        required: true
+        default: false
+        description: "Turn on if for migration"
+      ## here  
+
+jobs:
+  initialize:
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.initialize.yml@v1.6
+    secrets: inherit
+    with:
+      default_deploy_env: 'prod'
+
+  docker_promote:
+    needs: initialize
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.docker-promote.yml@v1.6
+    secrets: inherit
+    with:
+      git_sha_short: ${{ needs.initialize.outputs.git_sha_short }}
+      source_ecr_name: '<stag-ecr-name>' 
+      target_ecr_name: '<prod-ecr-name>'
+
+  ecs-deploy:
+    needs: [initialize, docker_promote]
+    uses: naluri-hidup/reusable-workflows/.github/workflows/.ecs-deploy-task-definition.yml@v1.6
+    secrets: inherit
+    with:
+      deploy_env: ${{ needs.initialize.outputs.deploy_env }}
+      git_sha_short: ${{ needs.initialize.outputs.git_sha_short }}
+      ecr_name: '<prod-ecr-name>'
+      git_branch: ${{ needs.initialize.outputs.git_branch }}
+      reusable_tag: 'v1.6'
+      standalone_ecs_task: "${{ needs.initialize.outputs.standalone_task == 'true' }}"
+      aws_account: 'prod'
+      aws_region: 'ap-southeast-1'
