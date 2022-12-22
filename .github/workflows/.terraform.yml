@@ -50,7 +50,8 @@ jobs:
           echo $arr[0] # module
 
           IFS="/" read -a arr1 <<< $arr[1]
-          IFS=".tfvars" read -a arr1 <<< $arr1[${#arr1[@]} - 1]
+          lastIndex=${#arr1[@]} - 1
+          IFS=".tfvars" read -a arr1 <<< $arr1[$lastIndex]
 
           echo $arr1[0] # config
 
