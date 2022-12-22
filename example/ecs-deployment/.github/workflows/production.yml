@@ -1,6 +1,9 @@
 name: Production Deployment
 
 on:
+  push:
+    tags:
+      - "*"
   workflow_dispatch:
     inputs:
       deploy_env:
