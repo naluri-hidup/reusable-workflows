@@ -33,6 +33,7 @@ jobs:
             **/**/config/**
 
       - name: List all changed files
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         id: terraform-config-changes
         run: |
           JSON_files="["
