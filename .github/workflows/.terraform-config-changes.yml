@@ -6,12 +6,14 @@ on:
       git_branch:
         required: true
         type: string
-
+    outputs:
+      terraform-config-changes:
+        value: ${{ jobs.terraform-config-changes.outputs.files }}
 jobs:
   terraform-config-changes:
     runs-on: ubuntu-latest
     outputs:
-      terraform-config-changes: ${{ steps.terraform-config-changes.outputs.files }}
+      files: ${{ steps.terraform-config-changes.outputs.files }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
