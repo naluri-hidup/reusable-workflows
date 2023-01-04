@@ -7,13 +7,16 @@ on:
         required: true
         type: string
     outputs:
-      terraform-config-changes:
+      terraform_config_changes:
         value: ${{ jobs.terraform-config-changes.outputs.files }}
+      any_changed:
+        value: ${{ jobs.terraform-config-changes.outputs.any_changed }}
 jobs:
   terraform-config-changes:
     runs-on: ubuntu-latest
     outputs:
       files: ${{ steps.terraform-config-changes.outputs.files }}
+      any_changed: ${{ steps.changed-files-specific.outputs.any_changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
