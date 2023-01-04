@@ -100,3 +100,17 @@ jobs:
       - name: Terrraform Apply
         if: ${{ inputs.apply }}
         run: cd ${{ steps.terraform-config.outputs.module_path }} && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} DESTROY=${{ inputs.destroy }} terraform.apply
+
+      - name: Slack Notification Terraform Plan
+        if: ${{ inputs.apply == false }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch, config: ${{ inputs.config_path }} plan by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+
+      - name: Slack Notification Terraform Apply
+        if: ${{ inputs.apply }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch, config: ${{ inputs.config_path }} apply by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+
+      

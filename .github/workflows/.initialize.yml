@@ -9,6 +9,11 @@ on:
       default_deploy_env:
         required: true
         type: string
+      terraform_action:
+        required: false
+        type: boolean
+        default: false
+
     outputs:
       git_branch:
         value: ${{ jobs.initialize.outputs.git_branch }}
@@ -62,9 +67,17 @@ jobs:
             echo "value=$(echo $STANDALONE_TASK)" >> $GITHUB_OUTPUT
           fi
         
-      - name: Slack Notification
+      - name: Slack Notification ECS deployment
+        if: ${{ inputs.terraform_action == false }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
           --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_git_var.outputs.git_branch }} source code branch to ${{ steps.set_deploy_env.outputs.value }} environment by *@${{ github.actor }}*: `started`"}' \
+          ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+
+      - name: Slack Notification Terraform deployment
+        if: ${{ inputs.terraform_action == true }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":rocket: [ *${{ github.repository }}* ] ${{ steps.set_git_var.outputs.git_branch }} source code branch by *@${{ github.actor }}*: `started`"}' \
           ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
 
