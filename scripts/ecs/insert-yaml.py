@@ -33,6 +33,12 @@ if 'linuxParameters' in data2[args.environment]:
 if 'command' in data2[args.environment]:
     data['containerDefinitions'][0]['command'] = data2[args.environment]['command']
 
+if 'volumes' in data2[args.environment]:
+    data['volumes'] = data2[args.environment]['volumes']
+
+if 'mountPoints' in data2[args.environment]:
+    data['containerDefinitions'][0]['mountPoints'] = data2[args.environment]['mountPoints']
+
 with open(dir_path + "/" + args.output, "w", encoding = "utf-8") as yaml_file:
     dump = ruamel.yaml.dump(data, Dumper=ruamel.yaml.RoundTripDumper)
     yaml_file.write(dump)
