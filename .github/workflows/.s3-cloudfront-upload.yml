@@ -89,7 +89,7 @@ jobs:
           aws-region: ${{ inputs.aws_region }}
 
       - run: |
-          aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_distribution_id }} --paths ${{ matrix.job }}
+          aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_distribution_id }} --paths '${{ matrix.job }}'
 
   notification:
     needs: [s3_upload, cloudfront_invalidation]
