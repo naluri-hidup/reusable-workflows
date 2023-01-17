@@ -75,7 +75,6 @@ jobs:
         job: ${{ fromJSON(inputs.invalidation_path) }}
       max-parallel: 3
     steps:
-
       - name: Configure AWS Credentials
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
