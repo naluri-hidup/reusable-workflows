@@ -18,6 +18,9 @@ on:
       MASTER_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: false
     inputs:
+      git_branch:
+        required: true
+        type: string
       s3_bucket_name:
         required: true
         type: string
@@ -88,3 +91,11 @@ jobs:
       - run: |
           aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_distribution_id }} --paths ${{ matrix.job }}
 
+  notification:
+    needs: [s3_upload, cloudfront_invalidation]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notification s3 cloudfront upload
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch, s3 - ${{ inputs.s3_bucket_name }}, cloudfront - ${{ inputs.cloudfront_distribution_id }} uploaded by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}

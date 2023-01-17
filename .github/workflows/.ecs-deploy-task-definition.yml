@@ -74,7 +74,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v1.7.0
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -114,15 +114,15 @@ jobs:
           fi
           
           ## For Ecs Update
-          echo "::set-output name=task_definition_name::$task_definition_name"
-          echo "::set-output name=cluster_name::$cluster_name"
-          echo "::set-output name=service_name::$service_name"
+          echo "task_definition_name=$task_definition_name" >> $GITHUB_OUTPUT
+          echo "cluster_name=$cluster_name" >> $GITHUB_OUTPUT
+          echo "service_name=$service_name" >> $GITHUB_OUTPUT
 
           ## Generate Task definition
           if [[ -z ${task_definition_template} ]]; then
-            echo "::set-output name=use_ecs_template::false"
+            echo "use_ecs_template=false" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=use_ecs_template::true"
+            echo "use_ecs_template=true" >> $GITHUB_OUTPUT
             filepath="template/ecs-td-template/${task_definition_template}.yml"
             python3 template/scripts/ecs/env-yaml.py -t $filepath -o task-definition.yml
             python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task-definition.yml -o task-definition.yml
