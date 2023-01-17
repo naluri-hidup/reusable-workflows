@@ -1,0 +1,87 @@
+name: Workflow s3 cloudfront upload & invalidation
+
+on:
+  workflow_call:
+    secrets:
+      SLACK_DEPLOYMENT_WEBHOOK:
+        required: true
+      STAG_GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      STAG_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
+      PROD_GH_ACTIONS_ACCESS_KEY_ID:
+        required: false
+      PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: false
+      MASTER_GH_ACTIONS_ACCESS_KEY_ID:
+        required: false
+      MASTER_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: false
+    inputs:
+      s3_bucket_name:
+        required: true
+      cloudfront_distribution_id:
+        required: true
+      artifact_list:
+        required: true
+      invalidation_path:
+        required: true
+      aws_account:
+        required: false
+        type: string
+        default: 'stag'
+      aws_region:
+        required: false
+        type: string
+        default: 'ap-southeast-1'
+
+jobs:
+  s3_upload:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: ${{ fromJSON(inputs.artifact_list) }}
+      max-parallel: 3
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: "${{ matrix.job.name }}"
+          path: "${{ matrix.job.name }}"
+
+      - name: Configure AWS Credentials
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: S3 Upload
+        run: |
+          aws s3 sync ${{ matrix.job.name }} s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --delete --sse AES256 --follow-symlinks
+
+  cloudfront_invalidation:
+    needs: [s3_upload]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        job: ${{ fromJSON(inputs.invalidation_path) }}
+      max-parallel: 3
+    steps:
+
+      - name: Configure AWS Credentials
+        env:
+          GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
+          GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
+          aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - run: |
+          aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront_distribution_id }} --paths ${{ matrix.job }}
+
