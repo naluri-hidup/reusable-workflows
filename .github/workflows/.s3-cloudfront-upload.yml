@@ -20,12 +20,16 @@ on:
     inputs:
       s3_bucket_name:
         required: true
+        type: string
       cloudfront_distribution_id:
         required: true
+        type: string
       artifact_list:
         required: true
+        type: string
       invalidation_path:
         required: true
+        type: string
       aws_account:
         required: false
         type: string
