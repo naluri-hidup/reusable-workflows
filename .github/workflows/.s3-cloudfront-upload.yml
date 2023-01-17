@@ -98,4 +98,4 @@ jobs:
       - name: Slack Notification s3 cloudfront upload
         run: |
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch, s3 - ${{ inputs.s3_bucket_name }}, cloudfront - ${{ inputs.cloudfront_distribution_id }} uploaded by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
+          --data '{"text":":sparkles: [ *${{ github.repository }}* ] ${{ inputs.git_branch }} source code branch, s3 - ${{ inputs.s3_bucket_name }} uploaded by *@${{ github.actor }}*: `done`"}' ${{ secrets.SLACK_DEPLOYMENT_WEBHOOK }}
