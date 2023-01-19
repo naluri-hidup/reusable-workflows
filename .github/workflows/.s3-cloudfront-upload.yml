@@ -70,7 +70,7 @@ jobs:
         run: |
           aws s3 sync ${{ matrix.job.name }} s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --delete --sse AES256 --follow-symlinks
           
-          nocache=${{ matrix.job.nocache_path }}
+          nocache=`echo ${{ matrix.job.nocache_path }}`
           
           echo $nocache
 
