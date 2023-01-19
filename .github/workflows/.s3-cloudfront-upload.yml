@@ -74,8 +74,8 @@ jobs:
           
           if [[ ! -z $nocache ]]; then
             readarray -td, a <<<"$nocache"; declare -p a;
-            
-            for p in $a do
+
+            for p in $a; do
               echo $p
               aws s3 cp ${{ matrix.job.name }}/$p s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --sse AES256 --follow-symlinks --metadata-directive REPLACE --cache-control 'public, must-revalidate, proxy-revalidate, max-age=0'
             done
