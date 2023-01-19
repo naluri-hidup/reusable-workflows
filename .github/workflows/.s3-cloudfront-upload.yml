@@ -33,7 +33,6 @@ on:
       invalidation_path:
         required: true
         type: string
-      
       aws_account:
         required: false
         type: string
@@ -70,8 +69,14 @@ jobs:
       - name: S3 Upload
         run: |
           aws s3 sync ${{ matrix.job.name }} s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --delete --sse AES256 --follow-symlinks
-          ## TODO for loop
-          aws s3 cp ${{ matrix.job.name }}/index.html s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --sse AES256 --follow-symlinks --metadata-directive REPLACE --cache-control 'public, must-revalidate, proxy-revalidate, max-age=0'
+          
+          if [[ ! -z ${{ matrix.job.nocache_path }} ]]; then
+            nocache=`echo "${{ matrix.job.nocache_path }}" | jq -c '.[]'`
+            for p in $nocache do
+              echo "No Cache ${p}"
+              aws s3 cp ${{ matrix.job.name }}/$p s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --sse AES256 --follow-symlinks --metadata-directive REPLACE --cache-control 'public, must-revalidate, proxy-revalidate, max-age=0'
+            done
+          fi
 
   cloudfront_invalidation:
     needs: [s3_upload]
