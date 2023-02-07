@@ -1,5 +1,6 @@
 name: Workflow update ECS task definition
-
+# Git path
+# Deployment yaml path
 on:
   workflow_call:
     secrets:
@@ -45,7 +46,11 @@ on:
         required: false
         type: boolean
         default: false
-        
+      source_path:
+        required: false
+        type: string
+        default: ''
+
 jobs:
   ecs-update:
     runs-on: ubuntu-latest
@@ -94,10 +99,11 @@ jobs:
           pip install envyaml
 
           export env="${{ inputs.deploy_env }}"
+          export source_path="main/${{ inputs.source_path }}deployment/definition.yml"
 
           ## Make the definition into Environment variables
           set -a;
-          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; import os; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path("main/deployment/definition.yml"))[os.environ["env"]]["ecs"].items()]))');
+          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; import os; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path(os.environ["source_path"]))[os.environ["env"]]["ecs"].items()]))');
           set a+;
 
           ## For Setting default value

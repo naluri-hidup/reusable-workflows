@@ -50,6 +50,10 @@ on:
         required: false
         type: string
         default: 'stag'
+      source_path:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   docker_build: 
@@ -90,6 +94,10 @@ jobs:
           DOCKER_BUILDKIT: 1
           FIREBASE_SERVICE_ACCOUNT: FIREBASE_SERVICE_ACCOUNT_${{ inputs.firebase_env }}
         run: |
+          if [[ ${{ inputs.source_path }} != '' ]]; then
+            cd ${{ inputs.source_path }}
+          fi
+
           if [[ ${{ inputs.builder_cache }} == false ]]; then
 
             docker buildx build \
