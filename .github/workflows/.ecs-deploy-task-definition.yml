@@ -131,7 +131,7 @@ jobs:
             echo "use_ecs_template=true" >> $GITHUB_OUTPUT
             filepath="template/ecs-td-template/${task_definition_template}.yml"
             python3 template/scripts/ecs/env-yaml.py -t $filepath -o task-definition.yml
-            python3 template/scripts/ecs/insert-yaml.py -e $env -s 'main/deployment/definition.yml' -d task-definition.yml -o task-definition.yml
+            python3 template/scripts/ecs/insert-yaml.py -e $env -s $source_path -d task-definition.yml -o task-definition.yml
             cat task-definition.yml
           fi
 
