@@ -53,7 +53,7 @@ on:
       source_path:
         required: false
         type: string
-        default: ''
+        default: "''"
       git_sha_short_ecr:
         required: true
         type: string
