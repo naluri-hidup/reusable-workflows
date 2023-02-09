@@ -12,7 +12,7 @@ on:
       PROD_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: false
     inputs:
-      git_sha_short:
+      git_sha_short_ecr:
         required: true
         type: string
       source_aws_account:
@@ -60,7 +60,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
         run: |
-          docker pull $ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short }}
+          docker pull $ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short_ecr }}
 
       - name: Configure AWS Credentials - Target ECR
         env:
@@ -81,7 +81,7 @@ jobs:
           SOURCE_ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
           TARGET_ECR_REGISTRY: ${{ steps.login-target-ecr.outputs.registry }}
         run: |
-          docker tag $SOURCE_ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short }} $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short }}
-          docker push $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short }}
+          docker tag $SOURCE_ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short_ecr }} $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short_ecr }}
+          docker push $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short_ecr }}
         
 

@@ -50,6 +50,9 @@ on:
         required: false
         type: string
         default: ''
+      git_sha_short_ecr:
+        required: true
+        type: string
 
 jobs:
   ecs-update:
@@ -154,7 +157,7 @@ jobs:
           fi
 
           ## Image hash/tag
-          image_name="$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short }}"
+          image_name="$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short_ecr }}"
           cat $filepath | jq '.containerDefinitions[0].image='\"${image_name}\" > $final_path
 
           ## Add TD

@@ -23,6 +23,8 @@ on:
         value: ${{ jobs.initialize.outputs.deploy_env }}
       standalone_task:
         value: ${{ jobs.initialize.outputs.standalone_task }}
+      git_sha_short_ecr:
+        value: ${{ jobs.initialize.outputs.git_sha_short_ecr }}
 jobs:
   initialize:
     runs-on: ubuntu-latest
@@ -31,6 +33,7 @@ jobs:
       git_sha_short: ${{ steps.set_git_var.outputs.git_sha_short }}
       deploy_env: ${{ steps.set_deploy_env.outputs.value }}
       standalone_task: ${{ steps.set_standalone_task.outputs.value }}
+      git_sha_short_ecr: ${{ steps.set_git_var.outputs.git_sha_short_ecr }}
     steps:
       - name: Set git branch
         id: set_git_var
@@ -40,9 +43,12 @@ jobs:
           if [[ $TAG == "refs/heads/"* ]]; then
             echo "git_branch=$(echo ${GITHUB_REF#refs/heads/})" >> $GITHUB_OUTPUT 
             echo "git_sha_short=$(echo ${GITHUB_SHA::7})" >> $GITHUB_OUTPUT 
+            ECR_SHA="commit-${GITHUB_SHA::7}"
+            echo "git_sha_short_ecr=$(echo $ECR_SHA)" >> $GITHUB_OUTPUT
           else
             echo "git_branch=$(echo $TAG)" >> $GITHUB_OUTPUT
             echo "git_sha_short=$(echo $TAG)" >> $GITHUB_OUTPUT
+            echo "git_sha_short_ecr$(echo $TAG)" >> $GITHUB_OUTPUT
           fi
           
       - name: Set deploy env
