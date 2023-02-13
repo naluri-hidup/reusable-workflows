@@ -48,7 +48,7 @@ jobs:
           else
             echo "git_branch=$(echo $TAG)" >> $GITHUB_OUTPUT
             echo "git_sha_short=$(echo $TAG)" >> $GITHUB_OUTPUT
-            echo "git_sha_short_ecr$(echo $TAG)" >> $GITHUB_OUTPUT
+            echo "git_sha_short_ecr=$(echo $TAG)" >> $GITHUB_OUTPUT
           fi
           
       - name: Set deploy env
