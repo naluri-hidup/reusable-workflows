@@ -1,0 +1,92 @@
+# staging datadog sidecar template
+task-definition:
+  family: ${task_definition_name}
+  executionRoleArn: ${execution_role_name}
+  taskRoleArn: ${task_role_name}
+  volumes:
+    - name: "docker_sock"
+      host:
+        sourcePath: "/var/run/docker.sock"
+    - name: "proc"
+      host:
+        sourcePath: "/proc"
+    - name: "cgroup"
+      host:
+        sourcePath: "/sys/fs/cgroup/"
+    - name: "pointdir"
+      host:
+        sourcePath: "/opt/datadog-agent/run"
+    - name: "containers_root"
+      host:
+        sourcePath: "/var/lib/docker/containers/"
+  placementConstraints: []
+  networkMode: bridge
+  requiresCompatibilities:
+    - EC2
+  containerDefinitions:
+    - name: ${container_name}
+      image: dummy
+      cpu: ${cpu}
+      memory: ${memory}
+      portMappings: []
+      essential: true
+      environment: []
+      mountPoints: []
+      volumesFrom: []
+      secrets: []
+      entryPoint: []
+      command: []
+      links:
+        - "datadog-sidecar"
+      dependsOn:
+        - containerName: "datadog-sidecar"
+          condition: "START"
+      dockerLabels:
+        com.datadoghq.tags.env: ${env}
+        com.datadoghq.tags.service: ${task_definition_name}
+        com.datadoghq.tags.version: "${build_version}"
+    - name: datadog-sidecar
+      image: public.ecr.aws/datadog/agent:latest
+      cpu: 0
+      memory: 256
+      portMappings:
+        - containerPort: 8126
+          hostPort: 8126
+          protocol: tcp
+      essential: true
+      environment:
+        - name: DD_APM_ENABLED
+          value: "true"
+        - name: DD_APM_NON_LOCAL_TRAFFIC
+          value: "true"
+        - name: DD_CONTAINER_EXCLUDE
+          value: name:datadog-agent name:ecs-agent name:agent
+        - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+          value: "true"
+        - name: DD_LOGS_ENABLED
+          value: "true"
+        - name: DD_PROCESS_AGENT_ENABLED
+          value: "true"
+        - name: DD_SITE
+          value: datadoghq.com
+      mountPoints:
+        - sourceVolume: "cgroup"
+          containerPath: "/host/sys/fs/cgroup"
+        - sourceVolume: "docker_sock"
+          containerPath: "/var/run/docker.sock"
+        - sourceVolume: "proc"
+          containerPath: "/host/proc"
+        - sourceVolume: "containers_root"
+          containerPath: "/var/lib/docker/containers"
+        - sourceVolume: "pointdir"
+          containerPath: "/opt/datadog-agent/run"
+      volumesFrom: []
+      secrets:
+        - name: DD_API_KEY
+          valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:679382507314:secret:stag/shared/datadog-DRGjqc:api_key::'
+      entryPoint: []
+      command: []
+      dockerLabels:
+        com.datadoghq.tags.env: ${env}
+        com.datadoghq.tags.service: ${task_definition_name}
+        com.datadoghq.tags.version: "${build_version}"
