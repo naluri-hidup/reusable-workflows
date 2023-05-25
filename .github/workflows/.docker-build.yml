@@ -107,7 +107,7 @@ jobs:
             --no-cache \
             --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-            --build-arg GH_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short_ecr }} -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest .
@@ -119,7 +119,7 @@ jobs:
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --build-arg COMMIT_SHA=${{ inputs.git_sha_short }} \
             --build-arg COMMIT_TAG=$GITHUB_REF_NAME \
-            --build-arg GH_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            --build-arg GH_TOKEN=${{ secrets.FOUNDATION_ACCESS_TOKEN }} \
             --build-arg APP_ENV=${{ inputs.deploy_env }} \
             --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short_ecr }} -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest .
