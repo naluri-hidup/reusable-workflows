@@ -55,6 +55,12 @@ on:
       git_sha_short_ecr:
         required: true
         type: string
+      artifact_name:
+        required: false
+        type: string
+      artifact_path:
+        required: false
+        type: string
 
 jobs:
   docker_build: 
@@ -70,6 +76,13 @@ jobs:
 
       - name: Git Pull 
         run: git pull origin ${{ inputs.git_branch }}
+
+      - name: Download artifact
+        if: ${{ inputs.artifact_name != '' && inputs.artifact_path != '' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: ${{ inputs.artifact_path }}
 
       - name: Configure AWS Credentials
         env:
