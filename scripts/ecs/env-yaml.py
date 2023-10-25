@@ -1,5 +1,5 @@
 from envyaml import EnvYAML
-import ruamel.yaml
+from ruamel.yaml import YAML
 import os 
 import argparse
 
@@ -13,8 +13,11 @@ dir_path = os.getcwd()
 # Use the task definition template
 env = EnvYAML(dir_path + '/' + args.template)
 
+yaml = YAML(type='safe')
+yaml.preserve_quotes = True
+
 with open(dir_path + '/' + args.output, "w", encoding = "utf-8") as yaml_file:
-    dump = ruamel.yaml.dump(env['task-definition'], Dumper=ruamel.yaml.RoundTripDumper)
+    dump = yaml.dump(env['task-definition'])
     yaml_file.write(dump)
 
 print(env['task-definition'])
