@@ -13,7 +13,7 @@ dir_path = os.getcwd()
 # Use the task definition template
 env = EnvYAML(dir_path + '/' + args.template)
 
-yaml = YAML(type='safe')
+yaml = YAML(typ='safe')
 yaml.preserve_quotes = True
 
 with open(dir_path + '/' + args.output, "w", encoding = "utf-8") as yaml_file:
