@@ -1,6 +1,5 @@
 from envyaml import EnvYAML
 from ruamel.yaml import YAML
-from io import StringIO
 import os 
 import argparse
 
@@ -16,10 +15,9 @@ env = EnvYAML(dir_path + '/' + args.template)
 
 yaml = YAML(typ='safe')
 yaml.preserve_quotes = True
-out = StringIO()
 
 with open(dir_path + '/' + args.output, "w", encoding = "utf-8") as yaml_file:
-    dump = yaml.dump(env['task-definition'], stream=out)
+    dump = yaml.dump(env['task-definition'], stream=None)
     yaml_file.write(dump)
 
 print(env['task-definition'])
