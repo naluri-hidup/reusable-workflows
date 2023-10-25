@@ -15,9 +15,10 @@ env = EnvYAML(dir_path + '/' + args.template)
 
 yaml = YAML(typ='safe')
 yaml.preserve_quotes = True
+out = StringIO()
 
 with open(dir_path + '/' + args.output, "w", encoding = "utf-8") as yaml_file:
-    dump = yaml.dump(env['task-definition'])
+    dump = yaml.dump(env['task-definition'], stream=out)
     yaml_file.write(dump)
 
 print(env['task-definition'])
