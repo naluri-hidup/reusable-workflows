@@ -23,7 +23,7 @@ task-definition:
   requiresCompatibilities:
     - EC2
   containerDefinitions:
-    - name: {{ ecs.container_name }}
+    - name: {{ ecs.task_definition_name }}
       image: dummy
       cpu: {{ ecs.cpu }}
       memory: {{ ecs.memory }}
@@ -41,7 +41,7 @@ task-definition:
       environment:
       {%- for env in environment | default([]) %}
         - name: {{ env.name }}
-          value: {{ env.value | string }}
+          value: "{{ env.value | string }}"
       {%- endfor %}
       {%- endif %}
       {%- if mountPoints is defined %}
