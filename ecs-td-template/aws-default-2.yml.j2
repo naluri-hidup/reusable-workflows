@@ -12,6 +12,11 @@ task-definition:
       image: dummy
       cpu: {{ ecs.cpu }}
       memory: {{ ecs.memory }}
+      {%- if ecs.gpu is defined %}
+      resourceRequirements:
+        - type: GPU
+          value: {{ ecs.gpu }}
+      {%- endif %}
       portMappings:
       {%- for portMapping in portMappings %}
         - containerPort: {{ portMapping.containerPort }}
