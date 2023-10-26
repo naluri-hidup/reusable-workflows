@@ -94,9 +94,12 @@ jobs:
 
       - name: Generate Task Definition
         id: generate
+        shell: bash
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
+          set -e  
+
           export env="${{ inputs.deploy_env }}"
           export source_path="main/${{ inputs.source_path }}deployment/definition.yml"
           export build_version="${{ inputs.git_sha_short }}"
@@ -104,13 +107,9 @@ jobs:
           pip3 install -r template/scripts/ecs/requirements.txt
 
           ## Generate Task definition
-          if [[ -z ${task_definition_template} ]]; then
-            echo "use_ecs_template=false" >> $GITHUB_OUTPUT
-          else
-            echo "use_ecs_template=true" >> $GITHUB_OUTPUT
-            python3 template/scripts/ecs/render-template.py -v $source_path -o task-definition.yml
-            cat task-definition.yml
-          fi
+          echo "use_ecs_template=true" >> $GITHUB_OUTPUT
+          python3 template/scripts/ecs/render-template.py -v $source_path -o task-definition.yml
+          cat task-definition.yml
 
       - name: Install yq - portable yaml processor
         uses: mikefarah/yq@v4
