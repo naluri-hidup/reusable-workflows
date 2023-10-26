@@ -26,7 +26,7 @@ task-definition:
       environment:
       {%- for env in environment | default([]) %}
         - name: {{ env.name }}
-          value: {{ env.value | string }}
+          value: "{{ env.value | string }}"
       {%- endfor %}
       {%- endif %}
       {%- if mountPoints is defined %}
