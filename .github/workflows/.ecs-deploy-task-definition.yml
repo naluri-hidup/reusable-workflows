@@ -37,11 +37,11 @@ on:
       aws_account:
         required: false
         type: string
-        default: 'stag'
+        default: "stag"
       aws_region:
         required: false
         type: string
-        default: 'ap-southeast-1'
+        default: "ap-southeast-1"
       standalone_ecs_task:
         required: false
         type: boolean
@@ -49,7 +49,7 @@ on:
       source_path:
         required: false
         type: string
-        default: ''
+        default: ""
       git_sha_short_ecr:
         required: true
         type: string
@@ -59,14 +59,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: main
           ref: ${{ inputs.git_branch }}
           fetch-depth: 0
-      
+
       - name: Checkout reusable
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: naluri-hidup/reusable-workflows
           path: template
@@ -77,12 +77,12 @@ jobs:
         run: |
           cd main && git pull origin ${{ inputs.git_branch }} && cd ..
           cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
-          
+
       - name: Configure AWS Credentials
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.0.1
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -96,56 +96,29 @@ jobs:
         id: generate
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run : |
-          pip install pathlib
-          pip install ruamel.yaml
-          pip install envyaml
-
+        run: |
           export env="${{ inputs.deploy_env }}"
           export source_path="main/${{ inputs.source_path }}deployment/definition.yml"
+          export build_version="${{ inputs.git_sha_short }}"
 
-          ## Make the definition into Environment variables
-          set -a;
-          eval $(python3 -c 'from pathlib import Path; from ruamel.yaml import YAML; import os; print("".join([f"{k}={v}\n" for k, v in YAML().load(Path(os.environ["source_path"]))[os.environ["env"]]["ecs"].items()]))');
-          set a+;
-
-          ## For Setting default value
-          if [[ -z ${task_role_name} ]]; then
-            export task_role_name='""'
-          fi
-
-          if [[ -z ${build_version} ]]; then
-            export build_version="${{ inputs.git_sha_short }}"
-          fi
-          
-          if [[ -z ${container_name} ]]; then
-            export container_name=$task_definition_name
-          fi
-          
-          ## For Ecs Update
-          echo "task_definition_name=$task_definition_name" >> $GITHUB_OUTPUT
-          echo "cluster_name=$cluster_name" >> $GITHUB_OUTPUT
-          echo "service_name=$service_name" >> $GITHUB_OUTPUT
+          pip3 install -r template/scripts/ecs/requirements.txt
 
           ## Generate Task definition
           if [[ -z ${task_definition_template} ]]; then
             echo "use_ecs_template=false" >> $GITHUB_OUTPUT
           else
             echo "use_ecs_template=true" >> $GITHUB_OUTPUT
-            filepath="template/ecs-td-template/${task_definition_template}.yml"
-            python3 template/scripts/ecs/env-yaml.py -t $filepath -o task-definition.yml
-            python3 template/scripts/ecs/insert-yaml.py -e $env -s $source_path -d task-definition.yml -o task-definition.yml
+            python3 template/scripts/ecs/render-template.py -v $source_path -o task-definition.yml
             cat task-definition.yml
           fi
+
+      - name: Install yq - portable yaml processor
+        uses: mikefarah/yq@v4
 
       - name: ECS deployment
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          VERSION=v4.2.0
-          BINARY=yq_linux_amd64
-          wget https://github.com/mikefarah/yq/releases/download/${VERSION}/${BINARY}.tar.gz -O - | tar xz && sudo mv ${BINARY} /usr/bin/yq
-
           final_path=actual-task-definition.json
 
           ## To json
@@ -171,7 +144,7 @@ jobs:
           else
             aws ecs run-task --cluster ${{ steps.generate.outputs.cluster_name }} --task-definition ${{ steps.generate.outputs.task_definition_name }}:$TASK_REVISION
           fi
-          
+
       - name: Slack Notification
         run: |
           curl -X POST -H 'Content-type: application/json' \
