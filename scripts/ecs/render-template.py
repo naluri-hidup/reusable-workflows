@@ -54,9 +54,10 @@ def main():
     parsed_template = parse_template(template_file.as_posix(), variables)
     yaml.dump(yaml.load(parsed_template)['task-definition'], final)
 
-  set_github_env('task_definition_name', variables.get('task_definition_name', ''))
-  set_github_env('cluster_name', variables.get('cluster_name', ''))
-  set_github_env('service_name', variables.get('service_name', ''))
+  ecs_variables = variables['ecs']
+  set_github_env('task_definition_name', ecs_variables.get('task_definition_name', ''))
+  set_github_env('cluster_name', ecs_variables.get('cluster_name', ''))
+  set_github_env('service_name', ecs_variables.get('service_name', ''))
 
 
 if __name__ == '__main__':
