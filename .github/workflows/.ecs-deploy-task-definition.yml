@@ -120,13 +120,8 @@ jobs:
         run: |
           final_path=actual-task-definition.json
 
-          ## To json
-          if [[ ${{ steps.generate.outputs.use_ecs_template }} == true ]]; then
-            yq e -j task-definition.yml > task-definition.json
-            filepath=task-definition.json
-          else
-            filepath=main/deployment/${{ inputs.deploy_env }}/task-definition.json
-          fi
+          yq e -j task-definition.yml > task-definition.json
+          filepath=task-definition.json
 
           ## Image hash/tag
           image_name="$ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short_ecr }}"
