@@ -36,11 +36,11 @@ on:
       aws_account:
         required: false
         type: string
-        default: 'stag'
+        default: "stag"
       aws_region:
         required: false
         type: string
-        default: 'ap-southeast-1'
+        default: "ap-southeast-1"
 
 jobs:
   s3_upload:
@@ -60,7 +60,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.0.1
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -69,7 +69,7 @@ jobs:
       - name: S3 Upload
         run: |
           aws s3 sync ${{ matrix.job.name }} s3://${{ inputs.s3_bucket_name }}/${{ matrix.job.s3_path }} --delete --sse AES256 --follow-symlinks
-          
+
           nocache=${{ matrix.job.nocache_path }}
 
           if [[ ! -z $nocache ]]; then
@@ -92,7 +92,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.0.1
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}

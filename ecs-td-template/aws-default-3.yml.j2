@@ -1,0 +1,175 @@
+task-definition:
+  family: {{ ecs.task_definition_name }}
+  executionRoleArn: {{ ecs.execution_role_name | default('') }}
+  taskRoleArn: {{ ecs.task_role_name | default('') }}
+  volumes:
+  - name: "docker_sock"
+    host:
+      sourcePath: "/var/run/docker.sock"
+  - name: "proc"
+    host:
+      sourcePath: "/proc"
+  - name: "cgroup"
+    host:
+      sourcePath: "/sys/fs/cgroup/"
+  - name: "pointdir"
+    host:
+      sourcePath: "/opt/datadog-agent/run"
+  - name: "containers_root"
+    host:
+      sourcePath: "/var/lib/docker/containers/"
+  placementConstraints: []
+  networkMode: {{ ecs.networkMode | default('bridge') }}
+  requiresCompatibilities:
+    - EC2
+  containerDefinitions:
+    - name: {{ ecs.container_name }}
+      image: dummy
+      cpu: {{ ecs.cpu }}
+      memory: {{ ecs.memory }}
+      portMappings:
+      {%- for portMapping in portMappings %}
+        - containerPort: {{ portMapping.containerPort }}
+          hostPort: {{ portMapping.hostPort }}
+          protocol: {{ portMapping.protocol | default('tcp') }}
+          {% if portMapping.appProtocol is defined %}
+          appProtocol: {{ portMapping.appProtocol }}
+          {% endif %}
+      {%- endfor %}
+      essential: true
+      {%- if environment is defined %}
+      environment:
+      {%- for env in environment | default([]) %}
+        - name: {{ env.name }}
+          value: {{ env.value | string }}
+      {%- endfor %}
+      {%- endif %}
+      {%- if mountPoints is defined %}
+      mountPoints:
+      {%- for mountPoint in mountPoints | default([]) %}
+        - sourceVolume: {{ mountPoint.sourceVolume }}
+          containerPath: {{ mountPoint.containerPath }}
+          readOnly: {{ mountPoint.readOnly | default(false) }}
+      {%- endfor %}
+      {%- endif %}
+      {%- if volumesFrom is defined %}
+      volumesFrom:
+      {%- for volumeFrom in volumesFrom | default([]) %}
+        - sourceContainer: {{ volumeFrom.sourceContainer }}
+          readOnly: {{ volumeFrom.readOnly | default(false) }}
+      {%- endfor %}
+      {%- endif %}
+      {%- if secrets is defined %}
+      secrets:
+      {%- for secret in secrets | default([]) %}
+        - name: {{ secret.name }}
+          valueFrom: "{{ secret.valueFrom }}"
+      {%- endfor %}
+      {%- endif %}
+      {%- if command is defined %}
+      command:
+      {%- for cmd in command | default([]) %}
+        - {{ cmd }}
+      {%- endfor %}
+      {%- endif %}
+      {%- if linuxParameters is defined %}
+      linuxParameters:
+        capabilities:
+          add:
+          {%- for cap in linuxParameters.capabilities.add | default([]) %}
+            - {{ cap }}
+          {%- endfor %}
+          drop:
+          {%- for cap in linuxParameters.capabilities.drop | default([]) %}
+            - {{ cap }}
+          {%- endfor %}
+        devices:
+        {%- for device in linuxParameters.devices | default([]) %}
+          - hostPath: {{ device.hostPath }}
+            containerPath: {{ device.containerPath }}
+            permissions:
+              - {{ device.permissions | default('') }}
+        {%- endfor %}
+        initProcessEnabled: {{ linuxParameters.initProcessEnabled | default(false) }}
+        maxSwap: {{ linuxParameters.maxSwap | default(0) }}
+        sharedMemorySize: {{ linuxParameters.sharedMemorySize | default(0) }}
+        swappiness: {{ linuxParameters.swappiness | default(0) }}
+        tmpfs:
+        {%- for tmpfs in linuxParameters.tmpfs | default([]) %}
+          - containerPath: {{ tmpfs.containerPath }}
+            size: {{ tmpfs.size | default(0) }}
+            mountOptions:
+            {%- for option in tmpfs.mountOptions | default([]) %}
+              - {{ option }}
+            {%- endfor %}
+        {%- endfor %}
+      {%- endif %}
+      {%- if ulimits is defined %}
+      ulimits:
+      {%- for ulimit in ulimits | default([]) %}
+        - name: {{ ulimit.name }}
+          softLimit: {{ ulimit.softLimit }}
+          hardLimit: {{ ulimit.hardLimit }}
+      {%- endfor %}
+      {%- endif %}
+      links:
+        - "datadog-sidecar"
+      dependsOn:
+        - containerName: "datadog-sidecar"
+          condition: "START"
+      dockerLabels:
+        com.datadoghq.tags.env: {{ env }}
+        com.datadoghq.tags.service: {{ ecs.task_definition_name }}
+        com.datadoghq.tags.version: {{ build_version | string }}
+      logConfiguration:
+        secretOptions: []
+        logDriver: awslogs
+        options:
+          awslogs-group: /ecs/{{ ecs.task_definition_name | default('default_task_definition_name') }}
+          awslogs-region: ap-southeast-1
+          awslogs-stream-prefix: {{ ecs.task_definition_name | default('default_task_definition_name') }}-log-stream
+    - name: datadog-sidecar
+      image: public.ecr.aws/datadog/agent:latest
+      cpu: 0
+      memory: 256
+      portMappings:
+        - containerPort: 8126
+          hostPort: 8126
+          protocol: tcp
+      essential: true
+      environment:
+        - name: DD_APM_ENABLED
+          value: "true"
+        - name: DD_APM_NON_LOCAL_TRAFFIC
+          value: "true"
+        - name: DD_CONTAINER_EXCLUDE
+          value: name:datadog-agent name:ecs-agent name:agent
+        - name: DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL
+          value: "true"
+        - name: DD_LOGS_ENABLED
+          value: "true"
+        - name: DD_PROCESS_AGENT_ENABLED
+          value: "true"
+        - name: DD_SITE
+          value: datadoghq.com
+      mountPoints:
+        - sourceVolume: "cgroup"
+          containerPath: "/host/sys/fs/cgroup"
+        - sourceVolume: "docker_sock"
+          containerPath: "/var/run/docker.sock"
+        - sourceVolume: "proc"
+          containerPath: "/host/proc"
+        - sourceVolume: "containers_root"
+          containerPath: "/var/lib/docker/containers"
+        - sourceVolume: "pointdir"
+          containerPath: "/opt/datadog-agent/run"
+      volumesFrom: []
+      secrets:
+        - name: DD_API_KEY
+          valueFrom: 'arn:aws:secretsmanager:ap-southeast-1:502605353565:secret:prod/shared/datadog-aCpsla:api_key::'
+      entryPoint: []
+      command: []
+      dockerLabels:
+          com.datadoghq.tags.env: {{ env }}
+          com.datadoghq.tags.service: {{ ecs.task_definition_name | default('') }}
+          com.datadoghq.tags.version: {{ build_version | default('latest') }}
