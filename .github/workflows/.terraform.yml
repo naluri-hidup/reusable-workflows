@@ -61,7 +61,7 @@ jobs:
           cd template && git pull origin ${{ inputs.reusable_tag }} && cd ..
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v3.0.1
+        uses: aws-actions/configure-aws-credentials@v4.0.1
         with:
           aws-access-key-id: ${{ secrets.TERRAFORM_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TERRAFORM_SECRET_ACCESS_KEY }}
