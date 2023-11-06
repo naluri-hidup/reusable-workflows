@@ -1,7 +1,11 @@
 task-definition:
   family: {{ ecs.task_definition_name }}
-  executionRoleArn: {{ ecs.execution_role_name | default('') }}
-  taskRoleArn: {{ ecs.task_role_name | default('') }}
+  {%- if ecs.execution_role_name is defined %}
+  executionRoleArn: "{{ ecs.execution_role_name }}"
+  {%- endif %}
+  {%- if ecs.task_role_name is defined %}
+  taskRoleArn: "{{ ecs.task_role_name }}"
+  {%- endif %}
   volumes:
   - name: "docker_sock"
     host:
