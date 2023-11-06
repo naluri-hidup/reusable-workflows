@@ -12,7 +12,7 @@ task-definition:
   requiresCompatibilities:
     - EC2
   containerDefinitions:
-    - name: {{ ecs.task_definition_name }}
+    - name: {{ ecs.container_name if ecs.container_name is defined else ecs.task_definition_name }}
       image: dummy
       cpu: {{ ecs.cpu }}
       memory: {{ ecs.memory }}
