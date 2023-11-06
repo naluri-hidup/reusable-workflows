@@ -93,7 +93,7 @@ jobs:
           echo $config_name
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
       
       - name: Terraform Init
         run: cd ${{ steps.terraform-config.outputs.module_path }} && make TERRAFORM_MODULE=${{ steps.terraform-config.outputs.module_name }} CONFIG_NAME=${{ steps.terraform-config.outputs.config_name }} terraform.init
