@@ -3,6 +3,10 @@ name: Workflow for move ecr image from one aws to another aws
 on:
   workflow_call:
     secrets:
+      DEV_GH_ACTIONS_ACCESS_KEY_ID:
+        required: true
+      DEV_GH_ACTIONS_SECRET_ACCESS_KEY:
+        required: true
       STAG_GH_ACTIONS_ACCESS_KEY_ID:
         required: true
       STAG_GH_ACTIONS_SECRET_ACCESS_KEY:
