@@ -109,7 +109,7 @@ task-definition:
       dockerLabels:
         com.datadoghq.tags.env: {{ env }}
         com.datadoghq.tags.service: {{ ecs.task_definition_name | default('') }}
-        com.datadoghq.tags.version: "{{ build_version | default('latest') }}"
+        com.datadoghq.tags.version: "{{ build_version|string|default('latest') }}"
       logConfiguration:
         secretOptions: []
         logDriver: awslogs
