@@ -42,7 +42,7 @@ def main():
   with open(args.variables) as definition:
     definitions = yaml.load(definition)
 
-  # possible values: stag, prod
+  # possible values: dev, stag, prod
   env = os.environ.get('env', 'stag')
   variables = definitions[env]
   if not variables:
