@@ -61,6 +61,11 @@ on:
 jobs:
   ecs-update:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.deploy_env }}
+    outputs:
+      task_definition_name: ${{ steps.generate.outputs.task_definition_name }}
+      cluster_name: ${{ steps.generate.outputs.cluster_name }}
+      service_name: ${{ steps.generate.outputs.service_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
