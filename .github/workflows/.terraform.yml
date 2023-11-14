@@ -42,13 +42,13 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_branch }}
           fetch-depth: 0
 
       - name: Checkout reusable
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: naluri-hidup/reusable-workflows
           path: template
