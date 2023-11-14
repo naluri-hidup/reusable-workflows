@@ -19,7 +19,7 @@ jobs:
       any_changed: ${{ steps.changed-files.outputs.any_changed }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ inputs.git_branch }}
           fetch-depth: 0
