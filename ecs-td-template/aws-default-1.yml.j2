@@ -68,6 +68,7 @@ task-definition:
       {%- endif %}
       {%- if linuxParameters is defined %}
       linuxParameters:
+        {%- if linuxParameters.capabilities is defined %}
         capabilities:
           add:
           {%- for cap in linuxParameters.capabilities.add | default([]) %}
@@ -77,6 +78,8 @@ task-definition:
           {%- for cap in linuxParameters.capabilities.drop | default([]) %}
             - {{ cap }}
           {%- endfor %}
+        {%- endif %}
+        {%- if linuxParameters.devices is defined %}
         devices:
         {%- for device in linuxParameters.devices | default([]) %}
           - hostPath: {{ device.hostPath }}
@@ -84,10 +87,12 @@ task-definition:
             permissions:
               - {{ device.permissions | default('') }}
         {%- endfor %}
+        {%- endif %}
         initProcessEnabled: {{ linuxParameters.initProcessEnabled | default(false) }}
         maxSwap: {{ linuxParameters.maxSwap | default(0) }}
         sharedMemorySize: {{ linuxParameters.sharedMemorySize | default(0) }}
         swappiness: {{ linuxParameters.swappiness | default(0) }}
+        {%- if linuxParameters.tmpfs is defined %}
         tmpfs:
         {%- for tmpfs in linuxParameters.tmpfs | default([]) %}
           - containerPath: {{ tmpfs.containerPath }}
@@ -97,6 +102,7 @@ task-definition:
               - {{ option }}
             {%- endfor %}
         {%- endfor %}
+        {%- endif %}
       {%- endif %}
       {%- if ulimits is defined %}
       ulimits:
