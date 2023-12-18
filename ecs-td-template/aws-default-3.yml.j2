@@ -103,10 +103,14 @@ task-definition:
               - {{ device.permissions | default('') }}
         {%- endfor %}
         {%- endif %}
-        initProcessEnabled: {{ linuxParameters.initProcessEnabled | default(false) }}
+        {%- if linuxParameters.initProcessEnabled is defined %}
+        initProcessEnabled: {{ linuxParameters.initProcessEnabled }}
+        {%- endif %}
+        {%- if linuxParameters.maxSwap is defined or linuxParameters.sharedMemorySize is defined or linuxParameters.swappiness is defined or linuxParameters.tmpfs is defined %}
         maxSwap: {{ linuxParameters.maxSwap | default(0) }}
         sharedMemorySize: {{ linuxParameters.sharedMemorySize | default(0) }}
         swappiness: {{ linuxParameters.swappiness | default(0) }}
+        {%- endif %}
         {%- if linuxParameters.tmpfs is defined %}
         tmpfs:
         {%- for tmpfs in linuxParameters.tmpfs | default([]) %}
