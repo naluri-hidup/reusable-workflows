@@ -55,7 +55,7 @@ jobs:
       max-parallel: 3
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: "${{ matrix.job.name }}"
           path: "${{ matrix.job.name }}"
@@ -64,7 +64,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v4.0.1
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -96,7 +96,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v4.0.1
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}

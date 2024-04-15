@@ -58,7 +58,7 @@ jobs:
 
       - name: Login to Amazon Source ECR
         id: login-source-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
       
       - name: Pull Image from Source ECR
         env:
@@ -70,7 +70,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.target_aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.target_aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v4.0.1
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -78,7 +78,7 @@ jobs:
 
       - name: Login to Amazon Target ECR
         id: login-target-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
       
       - name: Push Image to Target ECR
         env:
