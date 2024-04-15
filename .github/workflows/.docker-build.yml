@@ -83,7 +83,7 @@ jobs:
 
       - name: Download artifact
         if: ${{ inputs.artifact_name != '' && inputs.artifact_path != '' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}
           path: ${{ inputs.artifact_path }}
@@ -92,7 +92,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v4.0.1
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -100,7 +100,7 @@ jobs:
           
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

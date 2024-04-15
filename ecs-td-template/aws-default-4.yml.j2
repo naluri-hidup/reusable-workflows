@@ -34,7 +34,7 @@ task-definition:
       {%- if ecs.gpu is defined %}
       resourceRequirements:
         - type: GPU
-          value: {{ ecs.gpu }}
+          value: "{{ ecs.gpu }}"
       {%- endif %}
       portMappings:
       {%- for portMapping in portMappings %}
