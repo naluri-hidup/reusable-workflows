@@ -57,6 +57,10 @@ on:
       git_sha_short_ecr:
         required: true
         type: string
+      task_definition_path:
+        required: false
+        type: string
+        default: "deployment/definition.yml"
 
 jobs:
   ecs-update:
@@ -110,7 +114,7 @@ jobs:
           set -e  
 
           export env="${{ inputs.deploy_env }}"
-          export source_path="main/${{ inputs.source_path }}deployment/definition.yml"
+          export source_path="main/${{ inputs.source_path }}/${{ inputs.task_definition_path }}"
           export build_version="${{ inputs.git_sha_short }}"
 
           pip3 install -r template/scripts/ecs/requirements.txt
