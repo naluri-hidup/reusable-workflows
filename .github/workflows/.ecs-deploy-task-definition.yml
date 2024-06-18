@@ -114,7 +114,7 @@ jobs:
           set -e  
 
           export env="${{ inputs.deploy_env }}"
-          export source_path="main/${{ inputs.source_path }}/${{ inputs.task_definition_path }}"
+          export source_path="main/${{ inputs.source_path }}${{ inputs.task_definition_path }}"
           export build_version="${{ inputs.git_sha_short }}"
 
           pip3 install -r template/scripts/ecs/requirements.txt
