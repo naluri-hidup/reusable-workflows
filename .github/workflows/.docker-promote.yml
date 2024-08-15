@@ -22,26 +22,26 @@ on:
       source_aws_account:
         required: false
         type: string
-        default: 'stag'
+        default: "stag"
       source_aws_region:
         required: false
         type: string
-        default: 'ap-southeast-1'
+        default: "ap-southeast-1"
       source_ecr_name:
-          required: true
-          type: string
+        required: true
+        type: string
       target_aws_account:
         required: false
         type: string
-        default: 'prod'
+        default: "prod"
       target_aws_region:
         required: false
         type: string
-        default: 'ap-southeast-1'
+        default: "ap-southeast-1"
       target_ecr_name:
-          required: true
-          type: string
-    
+        required: true
+        type: string
+
 jobs:
   docker-promte:
     runs-on: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
         env:
           GH_ACTIONS_ACCESS_KEY_ID: ${{ inputs.source_aws_account }}_GH_ACTIONS_ACCESS_KEY_ID
           GH_ACTIONS_SECRET_ACCESS_KEY: ${{ inputs.source_aws_account }}_GH_ACTIONS_SECRET_ACCESS_KEY
-        uses: aws-actions/configure-aws-credentials@v2.2.0
+        uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
@@ -59,7 +59,7 @@ jobs:
       - name: Login to Amazon Source ECR
         id: login-source-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Pull Image from Source ECR
         env:
           ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
@@ -79,7 +79,7 @@ jobs:
       - name: Login to Amazon Target ECR
         id: login-target-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Push Image to Target ECR
         env:
           SOURCE_ECR_REGISTRY: ${{ steps.login-source-ecr.outputs.registry }}
@@ -87,5 +87,3 @@ jobs:
         run: |
           docker tag $SOURCE_ECR_REGISTRY/${{ inputs.source_ecr_name }}:${{ inputs.git_sha_short_ecr }} $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short_ecr }}
           docker push $TARGET_ECR_REGISTRY/${{ inputs.target_ecr_name }}:${{ inputs.git_sha_short_ecr }}
-        
-
