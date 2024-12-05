@@ -24,7 +24,7 @@ terraform.init:
 	-backend-config="region=$(TERRAFORM_BACKEND_REGION)" \
 	-backend-config="encrypt=true" \
 	-backend-config="dynamodb_table=$(TERRAFORM_BACKEND_DYNAMODB_TABLE)" \
-	-backend-config="role_arn=$(TERRAFORM_BACKEND_ROLE_ARN)"
+	-backend-config="assume_role={role_arn=\"$(TERRAFORM_BACKEND_ROLE_ARN)\"}"
 	terraform workspace select $(TERRAFORM_WORKSPACE) || terraform workspace new $(TERRAFORM_WORKSPACE)
 
 terraform.plan:
