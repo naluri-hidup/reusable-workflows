@@ -23,7 +23,7 @@ on:
         required: false
       MASTER_GH_ACTIONS_SECRET_ACCESS_KEY:
         required: false
-    inputs: 
+    inputs:
       builder_cache:
         required: false
         type: boolean
@@ -67,7 +67,7 @@ on:
         type: string
 
 jobs:
-  docker_build: 
+  docker_build:
     runs-on: ubuntu-latest
     outputs:
       ecr_image: ${{ steps.build_image.outputs.ecr_image }}
@@ -78,7 +78,7 @@ jobs:
           ref: ${{ inputs.git_branch }}
           fetch-depth: 0
 
-      - name: Git Pull 
+      - name: Git Pull
         run: git pull origin ${{ inputs.git_branch }}
 
       - name: Download artifact
@@ -97,7 +97,7 @@ jobs:
           aws-access-key-id: ${{ secrets[env.GH_ACTIONS_ACCESS_KEY_ID] }}
           aws-secret-access-key: ${{ secrets[env.GH_ACTIONS_SECRET_ACCESS_KEY] }}
           aws-region: ${{ inputs.aws_region }}
-          
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -139,5 +139,3 @@ jobs:
             --build-arg FIREBASE_SERVICE_ACCOUNT='${{ secrets[env.FIREBASE_SERVICE_ACCOUNT] }}' \
             --push -t $ECR_REGISTRY/${{ inputs.ecr_name }}:${{ inputs.git_sha_short_ecr }} -t $ECR_REGISTRY/${{ inputs.ecr_name }}:latest .
           fi
-
-          
